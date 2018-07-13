@@ -1,6 +1,6 @@
 $( document ).ready(function() {
-  drawBarChart([1, 7, 3, 1, 2, 5, -10, 8, 1, 1, 1, 18, 2], {}, '.chart');
-  drawBarChart([2, -3, -4, -5], {}, '.chart');
+  drawBarChart([1], {}, '.chart');
+  drawBarChart([1, 7, 3, 1, 2, 5, -10, 8, 1, 1, 1, 18, 2], {barGapRatio: 0.9}, '.chart');
 });
 
 const BAR_CHART_DEFAULTS = {
@@ -10,12 +10,15 @@ const BAR_CHART_DEFAULTS = {
 
 class BarChart {
   constructor(data, options, element) {
+    // first destroy DOM child elements previously created by a bar chart
+    $( element + '> [id^="bar"]').remove();
+
     this.data = data;
     this.element = element;
 
     // set options according to user or defaults
     this.padding = (options.padding >= 0) ? options.padding : BAR_CHART_DEFAULTS.padding;
-    this.barGapRatio = (options.barGapRatio > 0 && this.barGapRatio <= 1) ? options.barGapRatio : BAR_CHART_DEFAULTS.barGapRatio;
+    this.barGapRatio = (options.barGapRatio > 0 && options.barGapRatio <= 1) ? options.barGapRatio : BAR_CHART_DEFAULTS.barGapRatio;
 
     this.numBars = data.length;
 
