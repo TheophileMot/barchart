@@ -1,8 +1,11 @@
 $( document ).ready(function() {
-  drawBarChart([1, 7, 3, 1, 2, 5, 6, 8, 1, 1, 1, 18], {}, '.chart');
+  drawBarChart([1, 7, 3, 1, 2, 5, 6, 8, 1, 1, 1, 18, 2], {}, '.chart');
 });
 
-
+const BAR_CHART_DEFAULTS = {
+  barGapRatio: 0.6,
+  padding: 10,
+};
 
 function drawBarChart(data, options, element) {
   // data:
@@ -10,15 +13,20 @@ function drawBarChart(data, options, element) {
   // options:
   //   {defaultColour, barWidth, }
   
-  $( element ).width(determineChartWidth(data, options));
-  $( element ).height(determineChartHeight(data, options));
+  //$( element ).width(determineChartWidth(data, options));
+  //$( element ).height(determineChartHeight(data, options));
 
+  let barGapRatio = options.barGapRatio || BAR_CHART_DEFAULTS.barGapRatio;
+  let barSpacing = calcBarSpacing(data, options, element);
+  let barWidth = barSpacing * barGapRatio;
+  let padding = options.padding || BAR_CHART_DEFAULTS.padding;
 
   for (let i in data) {
     let height = data[i];
     let barId = 'bar' + i;
+    let leftPos = padding + i * barSpacing;
     $( element ).append(
-      '<div id="' + barId + '" style="width: 10px; height: 0px; background-color: darkslategrey; position: absolute; bottom: 0px; left: ' + (+i) * 20 + 'px;"></div>'
+      '<div id="' + barId + '" style="width: ' + barWidth + 'px; height: 0px; background-color: darkslategrey; position: absolute; bottom: 0px; left: ' + leftPos + 'px;"></div>'
     );
     $( '#' + barId ).animate({
       height: 10 * height + 'px',
@@ -26,7 +34,18 @@ function drawBarChart(data, options, element) {
   }
 }
 
-function determineChartWidth(data, options) {
+//  calculate horizontal spacing ("units") between bars:
+//    total available width is (element width - 2 * padding)
+//    each unit is (bar + gap), so there are (#bars - 1) units followed by the last bar
+function calcBarSpacing(data, options, element) {
+  let numBars = data.length;
+  let barGapRatio = options.barGapRatio || BAR_CHART_DEFAULTS.barGapRatio;
+  let padding = options.padding || BAR_CHART_DEFAULTS.padding;
+
+  return ($( element ).width() - 2 * padding) / (numBars - 1 + barGapRatio);
+}
+
+/*function determineChartWidth(data, options) {
   let numBars = data.length;
   let barWidth = options.barWidth || 10;
   let barGap = options.barGap || 10;
@@ -40,8 +59,5 @@ function determineChartHeight(data, options) {
   let minHeight = Math.min(0, ...data);
   let padding = options.padding || 0;
 
-  console.log(maxHeight);
-  console.log(minHeight);
-  console.log(10 * (maxHeight - minHeight + padding));
   return 10 * (maxHeight - minHeight + padding);
-}
+}*/
