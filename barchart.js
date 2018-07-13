@@ -3,8 +3,8 @@ $( document ).ready(function() {
 });
 
 const BAR_CHART_DEFAULTS = {
-  barGapRatio: 0.6,
-  padding: 10,
+  barGapRatio: 0.6, // bars slightly wider than gaps
+  padding: 15,
 };
 
 function drawBarChart(data, options, element) {
@@ -15,6 +15,8 @@ function drawBarChart(data, options, element) {
   
   //$( element ).width(determineChartWidth(data, options));
   //$( element ).height(determineChartHeight(data, options));
+
+  $( element ).prop('verticalScale', calcVerticalScale(data, options, element));
 
   let barGapRatio = options.barGapRatio || BAR_CHART_DEFAULTS.barGapRatio;
   let barSpacing = calcBarSpacing(data, options, element);
@@ -32,6 +34,17 @@ function drawBarChart(data, options, element) {
       height: 10 * height + 'px',
     });
   }
+}
+
+//  calculate scale for transforming y values to actual pixels:
+//    this depends on the heights of the bars; if all bars are positive (resp. negative), the lowest (resp. greatest) height is 0
+function calcVerticalScale(data, options, element) {
+  let padding = $.isNumeric(options.padding) ? options.padding : BAR_CHART_DEFAULTS.padding;
+  let maxHeight = Math.max(0, ...data);
+  let minHeight = Math.min(0, ...data);
+  let heightDiff = maxHeight - minHeight || 1;  // avoid division by zero
+
+  return ($( element ).height() - 2 * padding) / heightDiff;
 }
 
 //  calculate horizontal spacing ("units") between bars:
