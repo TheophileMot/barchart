@@ -1,0 +1,14 @@
+html, body { height: 100%; }
+
+body {
+  background-color: lemonchiffon;
+  font-size: 130%;
+  font-family: Georgia;
+  padding: 0 2em;
+  color: midnightblue;
+}
+
+.barChart {
+  background-color: darkolivegreen;
+  margin: 20px;
+}

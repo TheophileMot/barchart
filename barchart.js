@@ -1,20 +1,30 @@
 $( document ).ready(function() {
-  drawBarChart([1], {}, '.chart');
-  drawBarChart([1, 7, 3, 1, 2, 5, -10, 8, 1, 1, 1, 18, 2], {barGapRatio: 0.9}, '.chart');
+  drawBarChart([1, 2, 3], {}, '#chart1');  // this chart will get erased by the next one
+  drawBarChart([1, -1, 1, -1], {barGapRatio: 0.01}, '#chart1');
+
+  drawBarChart([1, 7, 3, 1, 2, 5, -10, 8, 1, 1, 1, 18, 2], {barGapRatio: 0.9, backgroundColourInherit: true}, '#chart2');
+
+  drawBarChart([13, -8, 5, -3, 2, -1, 1, 0, 1, 1, 2, 3, 5, 8, 13], {}, '#chart3');
 });
 
 const BAR_CHART_DEFAULTS = {
-  barGapRatio: 0.6, // bars slightly wider than gaps
+  barGapRatio: 0.6,                   // bars slightly wider than gaps
   padding: 10,
+  backgroundColour: 'darkslategrey',
 };
 
 class BarChart {
   constructor(data, options, element) {
     // first destroy DOM child elements previously created by a bar chart
-    $( element + '> [id^="bar"]').remove();
+    $( element + '> [id^="barChart"]').remove();
+
+    // generate (very likely) unique id to avoid collisions with other charts on page
+    this.generateId();
 
     this.data = data;
     this.element = element;
+
+    if (!options.backgroundColourInherit) { $( element ).css('background-color', options.backgroundColour || BAR_CHART_DEFAULTS.backgroundColour); }
 
     // set options according to user or defaults
     this.padding = (options.padding >= 0) ? options.padding : BAR_CHART_DEFAULTS.padding;
@@ -39,7 +49,7 @@ class BarChart {
   draw() {
     for (let i in this.data) {
       let height = this.data[i];
-      let barId = 'bar' + i;
+      let barId = 'barChart-' + this.id + '-bar' + i;
       let horizontalPos = 'left: ' + (this.padding + i * this.barSpacing) + 'px; width: ' + this.barWidth + 'px; ';
       let verticalPos;
       if (height >= 0) {
@@ -55,6 +65,24 @@ class BarChart {
       });
     }  
   }
+
+  // create ID using random string of hexadecimal characters
+  generateId() {
+    this.id = this.randomHexString(10);
+  }
+
+  randomHexString(length) {
+    let s = '';
+    for (let i = 0; i < length; i++) {
+      s += this.randomHexChar();
+    }
+    return s;
+  }
+  
+  randomHexChar() {
+    let r = Math.floor(Math.random() * 16);
+    return (r < 10) ? r : String.fromCharCode(97 + r);
+  }
   
   //  calculate horizontal spacing ("units") between bars:
   //    each unit is (bar + gap), so there are (#bars - 1) units followed by the last bar
@@ -67,11 +95,6 @@ class BarChart {
   calcVerticalScale() {
     let heightDiff = this.maxHeight - this.minHeight || 1;  // avoid division by zero
     return this.height / heightDiff;
-  }
-
-  //  transform on y-axis from bar to element, including padding
-  verticalTransform(y) {
-    return this.padding + y * this.verticalScale - this.minHeight;
   }
 }
 
