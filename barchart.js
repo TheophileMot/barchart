@@ -1,6 +1,6 @@
 $( document ).ready(function() {
   drawBarChart([1, 2, 3], {}, '#chart1');  // this chart will get erased by the next one
-  drawBarChart([1, -1, 1, -1], {barGapRatio: 0.01}, '#chart1');
+  drawBarChart([1, -1, 1, -1], {padding: 50, barGapRatio: 0.01}, '#chart1');
 
   drawBarChart([1, 7, 3, 1, 2, 5, -10, 8, 1, 1, 1, 18, 2], {barGapRatio: 0.9, backgroundColourInherit: true}, '#chart2');
 
@@ -59,9 +59,12 @@ class BarChart {
       }      
       $( this.element ).append(
         '<div id="' + barId + '" style="background-color: lightgoldenrodyellow; position: absolute; ' + horizontalPos + verticalPos + '"></div>'
-      );
-      $( '#' + barId ).animate({
-        height: Math.abs(height) * this.verticalScale + 'px', // make sure to take absolute value of height in case bar is negative
+      );      
+      // determine height of bar in pixels: take absolute value in case bar is negative;
+      //   also make sure to draw at least one pixel (for bars with 0 height)
+      let h = Math.max(1, Math.abs(height) * this.verticalScale);
+      $( '#' + barId ).animate({        
+        height: Math.abs(h)  + 'px',
       });
     }  
   }
