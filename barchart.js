@@ -4,13 +4,15 @@ $( document ).ready(function() {
 
   drawBarChart([1, 7, 3, 1, 2, 5, -10, 8, 1, 1, 1, 18, 2], {barGapRatio: 0.95, backgroundColourInherit: true}, '#chart2');
 
-  drawBarChart([13, -8, 5, -3, 2, -1, 1, 0, 1, 1, 2, 3, 5, 8, 13], {}, '#chart3');
+  drawBarChart([13, -8, 5, -3, 2, -1, 1, 0, 1, 1, 2, 3, 5, 8, 13], {backgroundColour: 'rgb(255, 200, 237)'}, '#chart3');
 });
 
 const BAR_CHART_DEFAULTS = {
   barGapRatio: 0.6,                   // bars slightly wider than gaps
   padding: 10,
   backgroundColour: 'darkslategrey',
+  displayXAxis: true,
+  displayYAxis: true,
 };
 
 class BarChart {
@@ -29,6 +31,8 @@ class BarChart {
     // set options according to user or defaults
     this.padding = (options.padding >= 0) ? options.padding : BAR_CHART_DEFAULTS.padding;
     this.barGapRatio = (options.barGapRatio > 0 && options.barGapRatio <= 1) ? options.barGapRatio : BAR_CHART_DEFAULTS.barGapRatio;
+    this.displayXAxis = (typeof options.displayXAxis == 'boolean') ? options.displayXAxis : BAR_CHART_DEFAULTS.displayXAxis;
+    this.displayYAxis = (typeof options.displayYAxis == 'boolean') ? options.displayYAxis : BAR_CHART_DEFAULTS.displayYAxis;
 
     this.numBars = data.length;
 
@@ -53,9 +57,12 @@ class BarChart {
 
   drawBars() {
     for (let i in this.data) {
+      // set left side
+      let leftPx = this.padding + i * this.barSpacing;
+      if (this.displayXAxis) { leftPx += (1 - this.barGapRatio) * this.barSpacing; }
       // set width
       let widthPx = Math.ceil(Math.max(1, this.barWidth));
-      let horizontalPos = 'left: ' + (this.padding + i * this.barSpacing) + 'px; width: ' + widthPx + 'px; ';
+      let horizontalPos = 'left: ' + leftPx + 'px; width: ' + widthPx + 'px; ';
 
       // set height
       let height = this.data[i];
@@ -72,7 +79,7 @@ class BarChart {
         '<div id="' + barId + '" style="background-color: lightgoldenrodyellow; position: absolute; ' + horizontalPos + verticalPos + '"></div>'
       );
       // determine height of bar in pixels: take absolute value in case bar is negative;
-      //   also make sure to draw at least one pixel (for bars with 0 height)
+      //   - also make sure to draw at least one pixel (for bars with 0 height)
       let heightPx = Math.ceil(Math.max(1, Math.abs(height) * this.verticalScale));
       $( '#' + barId ).animate({
         height: heightPx + 'px',
@@ -121,16 +128,25 @@ class BarChart {
   }
   
   //  calculate horizontal spacing ("units") between bars:
-  //    each unit is (bar + gap), so there are (#bars - 1) units followed by the last bar
+  //    - each unit is (bar + gap), so there are (#bars - 1) units followed by the last bar
+  //    - if drawing axes, put an extra gap before and after, so (#bars) units followed by a gap
   calcBarSpacing() {
-    return this.width / (this.numBars - 1 + this.barGapRatio);
+    if (this.displayXAxis) {
+      return this.width / (this.numBars + 1 - this.barGapRatio);
+    } else {
+      return this.width / (this.numBars - 1 + this.barGapRatio);
+    }
   }
 
   //  calculate scale for transforming y values to actual pixels:
-  //    this depends on the heights of the bars; if all bars are positive (resp. negative), the lowest (resp. greatest) height is 0
+  //    - this depends on the heights of the bars; if all bars are positive (resp. negative), the lowest (resp. greatest) height is 0
   calcVerticalScale() {
     let heightDiff = this.maxHeight - this.minHeight || 1;  // avoid division by zero
     return this.height / heightDiff;
+  }
+
+  clamp(x, min, max) {
+    return Math.max(min, Math.min(x, max));
   }
 
   //  --------------------------
@@ -153,19 +169,22 @@ class BarChart {
     return (0.3 * rgb[0] + 0.59 * rgb[1] + 0.11 * rgb[2]) / 255;
   }
 
-  // find a contrasting tint or shade, retaining hue. In particular, find colour that differs in luminance by lumDiff (between 0 and 0.5).
-  //    since we're using a simple linear model of luminance, we have luminance(k * rgb) = k * luminance(rgb)
+  // find a contrasting tint or shade, retaining hue. In particular, find colour that differs in luminance by lumDiff (between 0 and 1).
+  //    - N.B. a difference of greater than 0.5 is not always possible (e.g., if colour is mid-grey); cut off at pure white or pure black
+  //    - since we're using a simple linear model of luminance, we have luminance(k * rgb1 + rgb2) = k * luminance(rgb1) + luminance(rgb2)
   getContrastingColour(rgb, lumDiff) {
-    lumDiff = Math.min(lumDiff, 0.5);
+    lumDiff = this.clamp(lumDiff, 0, 1);
 
     let lum = this.luminance(rgb);
     if (lum < 0.5) {  // colour is dark: find a lighter version (tint), i.e., k * rgb + (1 - k) * white
       let k = (1 - lumDiff - lum) / (1 - lum);
-      return rgb.map( x => k * x + (1 - k) * 255);
+      rgb = rgb.map( x => k * x + (1 - k) * 255);
     } else {          // colour is light: find a darker version (shade), i.e., k * rgb + (1 - k) * black
       let k = (lum - lumDiff) / lum;
-      return rgb.map( x => k * x);
+      rgb = rgb.map( x => k * x);
     }
+    rgb = rgb.map( x => this.clamp(x, 0, 255) );
+    return rgb;
   }
 }
 
