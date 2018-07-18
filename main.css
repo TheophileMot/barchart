@@ -11,4 +11,5 @@ body {
 .barChart {
   background-color: darkolivegreen;
   margin: 20px;
+  float:left;
 }
