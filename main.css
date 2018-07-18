@@ -8,8 +8,26 @@ body {
   color: midnightblue;
 }
 
+h1 {
+  text-align: center;
+  background-color: dimgrey;
+  color: lemonchiffon;
+  width: 50%;
+  line-height: 125px;
+  margin: auto;
+}
+
 .barChart {
   background-color: darkolivegreen;
   margin: 20px;
-  float:left;
+  float: left;
+}
+
+.container {
+  width: 80%;
+  display: block;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  margin: auto;
 }
