@@ -2,7 +2,7 @@ $( document ).ready(function() {
   drawBarChart([1, 2, 3], {}, '#chart1');  // this chart will get erased by the next one
   drawBarChart([-1, -3, -5, -2], {padding: 50, barGapRatio: 0.000001}, '#chart1');
 
-  drawBarChart([1, 7, 3, 1, 2, 5, -10, 8, 1, 1, 1, 18, 2], {barGapRatio: 0.95, backgroundColourInherit: true}, '#chart2');
+  drawBarChart([1, 7, 0, 1, 2, 5, -10, 8, 1, 1, 1, 18, 2], {barGapRatio: 0.95, backgroundColourInherit: true}, '#chart2');
 
   drawBarChart([13, -8, 5, -3, 2, -1, 1, 0, 1, 1, 2, 3, 5, 8, 13], {backgroundColour: 'rgb(125, 200, 237)', displayXAxis: false}, '#chart3');
   
@@ -68,61 +68,69 @@ class BarChart {
 
   drawBars() {
     for (let i in this.data) {
-      // set left side
-      let leftPx = this.padding + i * this.barSpacing;
-      if (this.displayYAxis) { leftPx += (1 - this.barGapRatio) * this.barSpacing; }
-      // set width
-      let widthPx = Math.ceil(Math.max(1, this.barWidth));
-      let horizontalPos = 'left: ' + leftPx + 'px; width: ' + widthPx + 'px; ';
-
-      // set height
-      let height = this.data[i];
-      let verticalPos;
-      if (height >= 0) {
-        verticalPos = 'bottom: ' + this.xAxisFromBottom + 'px; height: 0px; ';
-      } else {
-        verticalPos = 'top: ' + this.xAxisFromTop + 'px; height: 0px; ';
-      }
-
       // create DOM element
       let barId = this.id + '-bar' + i;
-      let barColour = this.defaultBarColour;
-      $( this.element ).append(
-        '<div id="' + barId + '" style="background-color: ' + barColour + '; position: absolute; ' + horizontalPos + verticalPos + '"></div>'
-      );
+      let barOptions = {
+        backgroundColor: this.defaultBarColour,
+        position: 'absolute',
+        left: this.padding + i * this.barSpacing + (this.displayYAxis ? (1 - this.barGapRatio) * this.barSpacing : 0),
+        width: Math.ceil(Math.max(1, this.barWidth)),
+        bottom: (this.data[i] >= 0) ? this.xAxisFromBottom : undefined,
+        top: (this.data[i] < 0) ? this.xAxisFromTop : undefined,
+      };
+      this.createRectangle(barId, barOptions);
+
       // determine height of bar in pixels: take absolute value in case bar is negative;
       //   - also make sure to draw at least one pixel (for bars with 0 height), or two if drawing axis (which takes up one pixel itself)
       let minHeight = this.displayXAxis ? 2 : 1;
-      let heightPx = Math.ceil(Math.max(minHeight, Math.abs(height) * this.verticalScale));
+      let barHeight = Math.ceil(Math.max(minHeight, Math.abs(this.data[i]) * this.verticalScale));
       $( '#' + barId ).animate({
-        height: heightPx + 'px',
+        height: barHeight + 'px',
       });
     }
   }
 
   drawAxes() {
-    let axisWidth, axisHeight, axisId, axisBackgroundColour;
-
+    let axisColour = this.RGBArrayToString(this.contrastingShade(this.RGBStringToArray($( this.element ).css('background-color')), 0.25))
+    
     // x-axis
     if (this.displayXAxis) {
-      axisWidth = this.width;
-      axisHeight = 1;
-      axisId = this.id + '-yAxis';
-      axisBackgroundColour = this.RGBArrayToString(this.contrastingShade(this.RGBStringToArray($( this.element ).css('background-color')), 0.25));
-      $( this.element ).append(
-        '<div id="' + axisId + '" style="background-color:' + axisBackgroundColour +'; position: absolute; left:' + this.padding + 'px; bottom:' + this.xAxisFromBottom + 'px; width: ' + axisWidth + 'px; height: ' + axisHeight + 'px;"></div>'
-      );
+      let axisId = this.id + '-xAxis';
+      let axisOptions = {
+        position: 'absolute',
+        left: this.padding,
+        width: this.width,
+        bottom: this.xAxisFromBottom,
+        height: 1,
+        backgroundColor: axisColour,
+      };
+      this.createRectangle(axisId, axisOptions);
     }
 
     // y-axis
     if (this.displayYAxis) {
-      axisWidth = 1;
-      axisHeight = this.height;
-      axisId = this.id + '-yAxis';
-      axisBackgroundColour = this.RGBArrayToString(this.contrastingShade(this.RGBStringToArray($( this.element ).css('background-color')), 0.25));
-      $( this.element ).append(
-        '<div id="' + axisId + '" style="background-color:' + axisBackgroundColour +'; position: absolute; left:' + this.padding + 'px; bottom:' + this.padding + 'px; width: ' + axisWidth + 'px; height: ' + axisHeight + 'px;"></div>'
-      );
+      let axisId = this.id + '-yAxis';
+      let axisOptions = {
+        position: 'absolute',
+        left: this.padding,
+        width: 1,
+        bottom: this.padding,
+        height: this.height,
+        backgroundColor: axisColour,
+      };
+      this.createRectangle(axisId, axisOptions);
+    }
+  }
+
+  // add DIV element to DOM: used for bars and axes
+  createRectangle(id, cssOptions) {
+    $( this.element).append(
+      '<div id="' + id + '"></div>'
+    );
+    let rect = $( '#' + id );
+    for (let option in cssOptions) {
+      rect.css(option, cssOptions[option]);
+      //return;
     }
   }
 
