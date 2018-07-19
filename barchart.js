@@ -4,7 +4,7 @@ $( document ).ready(function() {
   drawBarChart([1, 7, 0, 1, 2, 5, -10, 8, 18, 2], {barGapRatio: 0.9, backgroundColourInherit: true}, '#chart2');
   drawBarChart([13, -8, 5, -3, 2, -1, 1, 0, 1, 1, 2, 3, 5, 8, 13], {backgroundColour: 'rgb(125, 200, 237)', displayXAxis: false}, '#chart3');
   drawBarChart([0, 1, 8, 27, 64], {backgroundColour: 'rgb(175, 35, 65)', displayXAxis: false, displayYAxis: false}, '#chart4');
-  drawBarChart([1, 2, 3, 2, 3, 1, 3, 2, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2], {backgroundColour: 'rgb(60, 180, 140)', padding: 25}, '#chart5');
+  drawBarChart([1, 2, 3, 2, 3, 1, 3, 2, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2], {backgroundColour: 'rgb(60, 180, 140)', padding: 25, animateBars: false}, '#chart5');
   drawBarChart([1, 3], {backgroundColour: 'rgb(200, 100, 5)', barGapRatio: 0.4}, '#chart6');
   drawBarChart([10, 33, 23, 64, 92, 25], {backgroundColour: 'rgb(240, 180, 250)', barGapRatio: 0.75}, '#chart7');
 });
@@ -17,6 +17,7 @@ const BAR_CHART_DEFAULTS = {
   displayXAxis: true,
   displayYAxis: true,
   displayHeights: true,
+  animateBars: true,
 };
 
 class BarChart {
@@ -40,6 +41,7 @@ class BarChart {
     this.displayXAxis = (typeof options.displayXAxis == 'boolean') ? options.displayXAxis : BAR_CHART_DEFAULTS.displayXAxis;
     this.displayYAxis = (typeof options.displayYAxis == 'boolean') ? options.displayYAxis : BAR_CHART_DEFAULTS.displayYAxis;
     this.displayHeights = (typeof options.displayHeights == 'boolean') ? options.displayHeights : BAR_CHART_DEFAULTS.displayHeights;
+    this.animateBars = (typeof options.animateBars == 'boolean') ? options.animateBars : BAR_CHART_DEFAULTS.animateBars;
     
     // set properties derived from colours
     this.axisBackgroundColour = this.contrastingShade(this.backgroundColour, 0.25);
@@ -74,12 +76,33 @@ class BarChart {
         width: this.barWidth,
         bottom: (this.data[i] >= 0) ? this.xAxisFromBottom : undefined,
         top: (this.data[i] < 0) ? this.xAxisFromTop : undefined,
+        height: this.animateBars ? 0 : this.barHeight(i),
       };
       this.createRectangle(barId, barOptions);
 
-      $( '#' + barId ).animate({
-        height: this.barHeight(i),
-      });
+      if (this.animateBars) {
+        // store some values for reference later, since scope of 'this' changes in jQuery animation
+        let displayHeights = this.displayHeights;
+        let labelId = this.id + '-heightLabel' + i;
+        let xAxisFromTop = this.xAxisFromTop;
+        let xAxisFromBottom = this.xAxisFromBottom;
+        let data = this.data[i];
+
+        $( '#' + barId ).animate({
+          height: this.barHeight(i),
+        }, {
+          duration: 2000,
+          step: function(now, fx) {
+            if (displayHeights) {
+              if  (data >= 0) {
+                $( '#' + labelId ).css('top', xAxisFromTop - now);
+              } else {
+                $( '#' + labelId ).css('bottom', xAxisFromBottom - now);
+              }
+            }
+          }
+        });
+      }
     }
   }
 
