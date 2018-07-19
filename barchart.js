@@ -1,16 +1,12 @@
 $( document ).ready(function() {
   drawBarChart([1, 2, 3], {}, '#chart1');  // this chart will get erased by the next one
   drawBarChart([-1, -3, -5, -2], {padding: 50, barGapRatio: 0.000001}, '#chart1');
-
-  drawBarChart([1, 7, 0, 1, 2, 5, -10, 8, 1, 1, 1, 18, 2], {barGapRatio: 0.95, backgroundColourInherit: true}, '#chart2');
-
+  drawBarChart([1, 7, 0, 1, 2, 5, -10, 8, 18, 2], {barGapRatio: 0.9, backgroundColourInherit: true}, '#chart2');
   drawBarChart([13, -8, 5, -3, 2, -1, 1, 0, 1, 1, 2, 3, 5, 8, 13], {backgroundColour: 'rgb(125, 200, 237)', displayXAxis: false}, '#chart3');
-  
   drawBarChart([0, 1, 8, 27, 64], {backgroundColour: 'rgb(175, 35, 65)', displayXAxis: false, displayYAxis: false}, '#chart4');
-
   drawBarChart([1, 2, 3, 2, 3, 1, 3, 2, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2], {backgroundColour: 'rgb(60, 180, 140)', padding: 25}, '#chart5');
-
   drawBarChart([1, 3], {backgroundColour: 'rgb(200, 100, 5)', barGapRatio: 0.4}, '#chart6');
+  drawBarChart([10, 33, 23, 64, 92, 25], {backgroundColour: 'rgb(240, 180, 250)', barGapRatio: 0.75}, '#chart7');
 });
 
 const BAR_CHART_DEFAULTS = {
@@ -20,6 +16,7 @@ const BAR_CHART_DEFAULTS = {
   defaultBarColour: 'auto',
   displayXAxis: true,
   displayYAxis: true,
+  displayHeights: true,
 };
 
 class BarChart {
@@ -31,7 +28,6 @@ class BarChart {
     this.id = this.generateId();
 
     this.data = data;
-    this.numBars = data.length;
     this.element = element;
 
     // set options according to user or defaults
@@ -43,9 +39,10 @@ class BarChart {
     this.barGapRatio = (options.barGapRatio > 0 && options.barGapRatio <= 1) ? options.barGapRatio : BAR_CHART_DEFAULTS.barGapRatio;
     this.displayXAxis = (typeof options.displayXAxis == 'boolean') ? options.displayXAxis : BAR_CHART_DEFAULTS.displayXAxis;
     this.displayYAxis = (typeof options.displayYAxis == 'boolean') ? options.displayYAxis : BAR_CHART_DEFAULTS.displayYAxis;
+    this.displayHeights = (typeof options.displayHeights == 'boolean') ? options.displayHeights : BAR_CHART_DEFAULTS.displayHeights;
     
     // set properties derived from colours
-    this.axisBackgroundColour = this.RGBArrayToString(this.contrastingShade(this.RGBStringToArray(this.backgroundColour), 0.25));
+    this.axisBackgroundColour = this.contrastingShade(this.backgroundColour, 0.25);
 
     // set dimensions of chart, excluding padding
     this.width = $( element ).width() - 2 * this.padding;
@@ -53,7 +50,7 @@ class BarChart {
 
     // set properties derived from dimensions
     this.barSpacing = this.calcBarSpacing();
-    this.barWidth = this.barSpacing * this.barGapRatio;
+    this.barWidth = Math.ceil(Math.max(1, this.barSpacing * this.barGapRatio));
     this.maxHeight = Math.max(0, ...this.data);
     this.minHeight = Math.min(0, ...this.data);
     this.verticalScale = this.calcVerticalScale(element);
@@ -64,34 +61,31 @@ class BarChart {
   draw() {
     this.drawBars();
     this.drawAxes();
+    this.drawHeightLabels();
   }
 
   drawBars() {
     for (let i in this.data) {
-      // create DOM element
       let barId = this.id + '-bar' + i;
       let barOptions = {
         backgroundColor: this.defaultBarColour,
         position: 'absolute',
-        left: this.padding + i * this.barSpacing + (this.displayYAxis ? (1 - this.barGapRatio) * this.barSpacing : 0),
-        width: Math.ceil(Math.max(1, this.barWidth)),
+        left: this.barLeftPos(i),
+        width: this.barWidth,
         bottom: (this.data[i] >= 0) ? this.xAxisFromBottom : undefined,
         top: (this.data[i] < 0) ? this.xAxisFromTop : undefined,
       };
       this.createRectangle(barId, barOptions);
 
-      // determine height of bar in pixels: take absolute value in case bar is negative;
-      //   - also make sure to draw at least one pixel (for bars with 0 height), or two if drawing axis (which takes up one pixel itself)
-      let minHeight = this.displayXAxis ? 2 : 1;
-      let barHeight = Math.ceil(Math.max(minHeight, Math.abs(this.data[i]) * this.verticalScale));
       $( '#' + barId ).animate({
-        height: barHeight + 'px',
+        height: this.barHeight(i),
       });
     }
   }
 
   drawAxes() {
-    let axisColour = this.RGBArrayToString(this.contrastingShade(this.RGBStringToArray($( this.element ).css('background-color')), 0.25))
+    const lumDiff = 0.25;
+    let axisColour = this.contrastingShade($( this.element ).css('background-color'), lumDiff);
     
     // x-axis
     if (this.displayXAxis) {
@@ -122,16 +116,53 @@ class BarChart {
     }
   }
 
+  drawHeightLabels() {
+    if (this.displayHeights) {
+      const lumDiff = 0.75;
+      for (let i in this.data) {
+        let barColour = $( '#' + this.id + '-bar' + i ).css('backgroundColor');
+        let labelColour = this.contrastingShade(barColour, lumDiff);
+        let labelId = this.id + '-heightLabel' + i;
+        let labelOptions = {
+          color: labelColour,
+          position: 'absolute',
+          //left: this.barLeftPos(i) + this.barWidth / 2,
+          //width: this.barWidth + 20,
+          bottom: (this.data[i] < 0) ? this.xAxisFromBottom - this.barHeight(i) : undefined,
+          top: (this.data[i] >= 0) ? this.xAxisFromTop - this.barHeight(i) : undefined,
+          //height: 1,
+          textAlign: 'center',
+        };
+        let rect = this.createRectangle(labelId, labelOptions, this.data[i]);
+        rect.css('left', this.barLeftPos(i) + (this.barWidth - parseFloat(rect.css('width'))) * 0.5);
+      }
+    }
+  }
+
+  // determine left side of ith bar in pixels. If displaying y-axis, account for extra gap that is added before first bar.
+  barLeftPos(i) {
+    return this.padding + i * this.barSpacing + (this.displayYAxis ? (1 - this.barGapRatio) * this.barSpacing : 0);
+  }
+
+  // determine height of ith bar in pixels
+  // - take absolute value in case bar is negative;
+  // - draw at least one pixel (for bars with 0 height), or two if drawing x-axis (which takes up one pixel itself)
+  barHeight(i) {
+    let minHeight = this.displayXAxis ? 2 : 1;
+    return Math.ceil(Math.max(minHeight, Math.abs(this.data[i]) * this.verticalScale));
+  }
+
   // add DIV element to DOM: used for bars and axes
-  createRectangle(id, cssOptions) {
+  createRectangle(id, cssOptions, contents) {
+    contents = (contents != undefined) ? contents : '';
     $( this.element).append(
-      '<div id="' + id + '"></div>'
+      '<div id="' + id + '">' + contents + '</div>'
     );
     let rect = $( '#' + id );
     for (let option in cssOptions) {
       rect.css(option, cssOptions[option]);
-      //return;
     }
+    return rect;  // to offer a convenient reference after creation
   }
 
   // create ID using random string of hexadecimal characters
@@ -157,9 +188,9 @@ class BarChart {
   //    - if drawing axes, put an extra gap before and after, so (#bars) units followed by a gap
   calcBarSpacing() {
     if (this.displayYAxis) {
-      return this.width / (this.numBars + 1 - this.barGapRatio);
+      return this.width / (this.data.length + 1 - this.barGapRatio);
     } else {
-      return this.width / (this.numBars - 1 + this.barGapRatio);
+      return this.width / (this.data.length - 1 + this.barGapRatio);
     }
   }
 
@@ -172,8 +203,8 @@ class BarChart {
 
   //  find a nice colour based on background: shift hue (say by 60˚), choose contrasting luminance (say with a lum. difference of 0.5)
   calcAutoBarColour() {
-    let hueShift = 30;
-    let lumDiff = 0.5;
+    const hueShift = 30;
+    const lumDiff = 0.5;
 
     let bg = this.RGBStringToArray(this.backgroundColour);
     let hsv = this.RGBtoHSV(bg);
@@ -279,6 +310,10 @@ class BarChart {
   //    - N.B. a difference of greater than 0.5 is not always possible (e.g., if colour is mid-grey); cut off at pure white or pure black
   //    - since we're using a simple linear model of luminance, we have luminance(k * rgb1 + rgb2) = k * luminance(rgb1) + luminance(rgb2)
   contrastingShade(rgb, lumDiff) {
+    if (typeof rgb == 'string') { // input and output are strings: convert to array and back
+      return this.RGBArrayToString(this.contrastingShade(this.RGBStringToArray(rgb), lumDiff));
+    }
+
     lumDiff = this.clamp(lumDiff, 0, 1);
     let lum = this.luminance(rgb);
     let targetLum = lum + lumDiff * ((lum < 0.5) ? 1 : -1); // if rgb is dark, target light colour, and vice-versa
