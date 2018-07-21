@@ -1,6 +1,6 @@
 $( document ).ready(function() {
   drawBarChart([1, 2, 3], {}, '#chart1');  // this chart will get erased by the next one
-  drawBarChart([[-1, 'a'], [-3, 'b'], [-5, 'c'], [-2, 'd']], {padding: 50, barGapRatio: 0.000001}, '#chart1');
+  drawBarChart([[-1, 'a'], [-3, 'b'], [-5, 'c'], [-2, 'd']], {padding: 50, barGapRatio: 0.000001, caption: 'heyo'}, '#chart1');
   drawBarChart([1, 7, 0, 1, 2, 5, -10, 8, 18, 2], {barGapRatio: 0.9, backgroundColourInherit: true, displayHeights: false}, '#chart2');
   drawBarChart([13, -8, 5, -3, 2, -1, 1, 0, 1, 1, 2, 3, 5, 8, 13], {backgroundColour: 'rgb(125, 200, 237)', displayXAxis: false, barGapRatio: 0.8, animateHeightLabels: false}, '#chart3');
   drawBarChart([0, 1, 8, 27, 64], {backgroundColour: 'rgb(175, 35, 65)', displayXAxis: false, displayYAxis: false}, '#chart4');
@@ -13,6 +13,7 @@ $( document ).ready(function() {
 const BAR_CHART_DEFAULTS = {
   barGapRatio: 0.6,                   // bars slightly wider than gaps
   padding: 10,
+  backgroundColourInherit: false,
   backgroundColour: 'darkslategrey',
   defaultBarColour: 'auto',
   displayXAxis: true,
@@ -20,6 +21,7 @@ const BAR_CHART_DEFAULTS = {
   displayHeights: true,
   animateBars: true,
   animateHeightLabels: true,
+  caption: '',
 };
 
 class BarChart {
@@ -31,33 +33,49 @@ class BarChart {
     this.id = this.generateId();
 
     this.data = data;
+    this.options = options;
     this.element = element;
 
     // see how many sig. figs there are in data; to be used while animating height labels
     this.dataPrecision = this.precision(data);
     this.dataDecimalPlaces = this.decimalPlaces(data);
 
-    // set options according to user or defaults
-    if (!options.backgroundColourInherit) { $( element ).css('background-color', options.backgroundColour || BAR_CHART_DEFAULTS.backgroundColour); }
-    this.defaultBarColour = options.defaultBarColour || BAR_CHART_DEFAULTS.defaultBarColour;
-    this.backgroundColour = $( element ).css('background-color');
-    if (this.defaultBarColour == 'auto') { this.defaultBarColour = this.calcAutoBarColour(); }
-    this.padding = (options.padding >= 0) ? options.padding : BAR_CHART_DEFAULTS.padding;
+    // set primary properties (from user input or defaults), then secondary properties (derived from primary)
+    this.setPrimaryProperties();
+    this.setSecondaryProperties();
+  }
+
+  setPrimaryProperties() {
+    let options = this.options;
+    let element = this.element;
+    
     this.barGapRatio = (options.barGapRatio > 0 && options.barGapRatio <= 1) ? options.barGapRatio : BAR_CHART_DEFAULTS.barGapRatio;
+    this.padding = (options.padding >= 0) ? options.padding : BAR_CHART_DEFAULTS.padding;
+    if (!BAR_CHART_DEFAULTS.backgroundColourInherit && !options.backgroundColourInherit) {  // if not inheriting, manually set colour (overriding backgroundColour option)
+      $( element ).css('background-color', options.backgroundColour || BAR_CHART_DEFAULTS.backgroundColour);
+    }
+    this.backgroundColour = $( element ).css('background-color');
+    this.defaultBarColour = options.defaultBarColour || BAR_CHART_DEFAULTS.defaultBarColour;
+    if (this.defaultBarColour == 'auto') { this.defaultBarColour = this.calcAutoBarColour(); }
     this.displayXAxis = (typeof options.displayXAxis == 'boolean') ? options.displayXAxis : BAR_CHART_DEFAULTS.displayXAxis;
     this.displayYAxis = (typeof options.displayYAxis == 'boolean') ? options.displayYAxis : BAR_CHART_DEFAULTS.displayYAxis;
     this.displayHeights = (typeof options.displayHeights == 'boolean') ? options.displayHeights : BAR_CHART_DEFAULTS.displayHeights;
     this.animateBars = (typeof options.animateBars == 'boolean') ? options.animateBars : BAR_CHART_DEFAULTS.animateBars;
     this.animateHeightLabels = (typeof options.animateHeightLabels == 'boolean') ? options.animateHeightLabels : BAR_CHART_DEFAULTS.animateHeightLabels;
-    
-    // set properties derived from colours
+    this.caption = options.caption || BAR_CHART_DEFAULTS.caption;
+  }
+
+  setSecondaryProperties() {
+    let element = this.element;
+
+    // properties derived from colours
     this.axisBackgroundColour = this.contrastingShade(this.backgroundColour, 0.25);
 
-    // set dimensions of chart, excluding padding
+    // dimensions of chart, excluding padding
     this.width = $( element ).width() - 2 * this.padding;
     this.height = $( element ).height() - 2 * this.padding;
 
-    // set properties derived from dimensions
+    // properties derived from dimensions
     this.barSpacing = this.calcBarSpacing();
     this.barWidth = Math.ceil(Math.max(1, this.barSpacing * this.barGapRatio));
     this.maxHeight = Math.max(0, ...this.data);
@@ -66,7 +84,7 @@ class BarChart {
     this.xAxisFromBottom = this.padding + (-this.minHeight) * this.verticalScale;
     this.xAxisFromTop = this.padding + this.maxHeight * this.verticalScale;
   }
-
+  
   draw() {
     this.drawBars();
     this.drawAxes();
