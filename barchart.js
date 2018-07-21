@@ -2,9 +2,9 @@ $( document ).ready(function() {
   drawBarChart([1, 2, 3], {}, '#chart1');  // this chart will get erased by the next one
   drawBarChart([[-1, 'a'], [-3, 'b'], [-5, 'c'], [-2, 'd']], {padding: 50, barGapRatio: 0.000001}, '#chart1');
   drawBarChart([1, 7, 0, 1, 2, 5, -10, 8, 18, 2], {barGapRatio: 0.9, backgroundColourInherit: true, displayHeights: false}, '#chart2');
-  drawBarChart([13, -8, 5, -3, 2, -1, 1, 0, 1, 1, 2, 3, 5, 8, 13], {backgroundColour: 'rgb(125, 200, 237)', displayXAxis: false, barGapRatio: 0.8}, '#chart3');
+  drawBarChart([13, -8, 5, -3, 2, -1, 1, 0, 1, 1, 2, 3, 5, 8, 13], {backgroundColour: 'rgb(125, 200, 237)', displayXAxis: false, barGapRatio: 0.8, animateHeightLabels: false}, '#chart3');
   drawBarChart([0, 1, 8, 27, 64], {backgroundColour: 'rgb(175, 35, 65)', displayXAxis: false, displayYAxis: false}, '#chart4');
-  drawBarChart([1, 2, 3, 2, 3, 1, 3, 2, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 2, 3, 1, 3, 2, 3, 2, 1, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2], {backgroundColour: 'rgb(60, 180, 140)', padding: 25, animateBars: false, displayHeights: false}, '#chart5');
+  drawBarChart([1, 2, 3, 2, 3, 1, 3, 2, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 2, 3, 1, 3, 2, 3, 2, 1, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2], {backgroundColour: 'rgb(60, 180, 140)', barGapRatio: 0, padding: 0, animateBars: false, displayHeights: false}, '#chart5');
   drawBarChart([10000, 30000], {backgroundColour: 'rgb(200, 100, 5)', barGapRatio: 0.8}, '#chart6');
   drawBarChart([10000, 30000.1], {backgroundColour: 'rgb(200, 100, 5)', barGapRatio: 0.8}, '#chart7');
   drawBarChart([105.4, 53.33, 23.12, 64.5, 92.31, 25.1], {backgroundColour: 'rgb(24, 21, 25)', barGapRatio: 0.75}, '#chart8');
@@ -19,6 +19,7 @@ const BAR_CHART_DEFAULTS = {
   displayYAxis: true,
   displayHeights: true,
   animateBars: true,
+  animateHeightLabels: true,
 };
 
 class BarChart {
@@ -47,6 +48,7 @@ class BarChart {
     this.displayYAxis = (typeof options.displayYAxis == 'boolean') ? options.displayYAxis : BAR_CHART_DEFAULTS.displayYAxis;
     this.displayHeights = (typeof options.displayHeights == 'boolean') ? options.displayHeights : BAR_CHART_DEFAULTS.displayHeights;
     this.animateBars = (typeof options.animateBars == 'boolean') ? options.animateBars : BAR_CHART_DEFAULTS.animateBars;
+    this.animateHeightLabels = (typeof options.animateHeightLabels == 'boolean') ? options.animateHeightLabels : BAR_CHART_DEFAULTS.animateHeightLabels;
     
     // set properties derived from colours
     this.axisBackgroundColour = this.contrastingShade(this.backgroundColour, 0.25);
@@ -153,18 +155,11 @@ class BarChart {
   }
 
   animateBar(i) {
-    // store some values for reference later, since scope of 'this' changes in jQuery animation
-    let displayHeights = this.displayHeights;
-    let barId = this.id + '-bar' + i;
-    let bar = $( '#' + barId );
-    let labelId = this.id + '-heightLabel' + i;
-    let label = $( '#' + labelId );
-    let xAxisFromTop = this.xAxisFromTop;
-    let xAxisFromBottom = this.xAxisFromBottom;
-    let data = this.data[i];
-    let dataPrecision = this.dataPrecision;
-    let dataDecimalPlaces = this.dataDecimalPlaces;
-    let setPrecisionAndPlaces = this.setPrecisionAndPlaces;
+    // store reference to 'this', since scope changes in jQuery animation
+    let thisChart = this;
+    
+    let bar = $( '#' + this.id + '-bar' + i );
+    let label = $( '#' + this.id + '-heightLabel' + i );
 
     let targetHeight = this.barHeight(i);
 
@@ -175,26 +170,28 @@ class BarChart {
       step: function() {  // normally the syntax here would be function(now, fx), but since those parameters are unused, ESLint would throw an error
         bar.css('height', this.progress * targetHeight);
 
-        if (displayHeights) {
-          if (data >= 0) {
-            label.css('top', xAxisFromTop - this.progress * targetHeight);
+        if (thisChart.displayHeights) {
+          if (thisChart.data[i] >= 0) {
+            label.css('top', thisChart.xAxisFromTop - this.progress * targetHeight);
           } else {
-            label.css('bottom', xAxisFromBottom - this.progress * targetHeight);
+            label.css('bottom', thisChart.xAxisFromBottom - this.progress * targetHeight);
           }
           // if animating numbers on labels, try to keep roughly same level of information: allow one more significant figure, but don't use more decimal place
-          label.html(setPrecisionAndPlaces(this.progress * data, dataPrecision + 1, dataDecimalPlaces));
+          if (thisChart.animateHeightLabels) {
+            label.html(thisChart.setPrecisionAndPlaces(this.progress * thisChart.data[i], thisChart.dataPrecision + 1, thisChart.dataDecimalPlaces));
+          }
         }
       },
       always: function() {
         bar.css('height', targetHeight);
-        if (displayHeights) {
-          if (data >= 0) {
-            label.css('top', xAxisFromTop - targetHeight);
+        if (thisChart.displayHeights) {
+          if (thisChart.data[i] >= 0) {
+            label.css('top', thisChart.xAxisFromTop - targetHeight);
           } else {
-            label.css('bottom', xAxisFromBottom - targetHeight);
+            label.css('bottom', thisChart.xAxisFromBottom - targetHeight);
           }
           // if animating numbers on labels, try to keep roughly same level of information: allow one more significant figure, but don't use more decimal place
-          label.html(data);
+          label.html(thisChart.data[i]);
         }
       }
     });
