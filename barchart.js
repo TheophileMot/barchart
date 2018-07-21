@@ -1,15 +1,16 @@
 $( document ).ready(function() {
   drawBarChart([1, 2, 3], {caption: 'you won\'t see this'}, '#chart1');  // this chart will get erased by the next one
   //drawBarChart([[-1, 'a'], [-3, 'b'], [-5, 'c'], [-2, 'd']], {padding: 50, barGapRatio: 0.000001, caption: 'to do: add bar labels'}, '#chart1');
-  drawBarChart([-1, -3, -5, -2], {displayXAxis: false, padding: 50, barGapRatio: 0.000001, caption: 'previous chart here was automatically erased (see source)'}, '#chart1');
-  drawBarChart([1, 7, 0, 1, 2, 5, -10, 8, 18, 2], {barGapRatio: 0.9, backgroundColourInherit: true, displayHeights: false, caption: 'background colour inherited from page CSS (as opposed to bar chart defaults)'}, '#chart2');
-  drawBarChart([13, -8, 5, -3, 2, -1, 1, 0, 1, 1, 2, 3, 5, 8, 13], {backgroundColour: 'rgb(125, 200, 237)', displayAxes: false, barGapRatio: 0.8, animateHeightLabels: false, caption: 'these numbers don\'t animate', title: 'Fibonacci numbers can go backwards too', titleSize: 25, titleColour: 'rgb(0,0,0)'}, '#chart3');
-  drawBarChart([0, 1, 8, 27, 64], {backgroundColour: 'rgb(175, 35, 65)', displayYAxis: false}, '#chart4');
-  drawBarChart([1, 2, 3, 2, 3, 1, 3, 2, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 2, 3, 1, 3, 2, 3, 2, 1, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2], {backgroundColour: 'rgb(60, 180, 140)', barGapRatio: 0, padding: 0, animateBars: false, displayHeights: false}, '#chart5');
-  drawBarChart([10000, 30000], {backgroundColour: 'rgb(200, 100, 5)', barGapRatio: 0.8}, '#chart6');
-  drawBarChart([10000, 30000.1], {backgroundColour: 'rgb(200, 100, 5)', barGapRatio: 0.8}, '#chart7');
-  drawBarChart(Array(10).fill(100), {title: 'and they\'re off!', caption: 'note how the labels and heights grow at the same rate for each bar', backgroundColour: 'rgb(124, 112, 100)', displayAxes: false, randomSpeed: true}, '#chart8');
-  drawBarChart(Array(10).fill(100), {title: 'and they\'re off?', caption: 'note how the labels and heights grow at different rates for each bar', backgroundColour: 'rgb(124, 112, 100)', displayAxes: false, randomBarSpeed: true, randomHeightLabelSpeed: true}, '#chart9');
+  drawBarChart([-1, -3, -5, -2], {displayHeightLabels: false, displayAxes: false, padding: 50, barGapRatio: 0.000001, caption: '<p>previous chart here was automatically erased</p><p>(see source)</p>'}, '#chart1');
+  drawBarChart([1, 7, 0, 1, 2, 5, -10, 8, 18, 2], {barGapRatio: 0.9, backgroundColourInherit: true, displayHeightLabels: false, caption: 'background colour inherited from page CSS (as opposed to bar chart defaults)'}, '#chart2');
+  drawBarChart([13, -8, 5, -3, 2, -1, 1, 0, 1, 1, 2, 3, 5, 8, 13], {backgroundColour: 'rgb(162, 152, 112)', displayAxes: false, barGapRatio: 0.8, animateHeightLabels: false, caption: 'these number labels don\'t animate', captionPadding: 0, title: 'Fibonacci numbers can go backwards too', titleSize: 15, titlePadding: 0, titleColour: 'rgb(0,50,0)'}, '#chart3');
+  drawBarChart([1, 2, 3, 2, 3, 1, 3, 2, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 2, 3, 1, 3, 2, 3, 2, 1, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2], {backgroundColour: 'rgb(60, 180, 140)', barGapRatio: 0, padding: 0, animateBars: false, displayHeightLabels: false}, '#chart4');
+  drawBarChart([0, 1, 8, 27, 64], {title: 'whole numbers', caption: 'even though some inputs have 2 sig. figs, all inputs are integers: thus, animated numbers are restricted to integers as well (so we won\'t see 1.5, say, even though it has only 2 sig. figs)', captionSize: 12, captionPadding: 2, backgroundColour: 'rgb(175, 35, 65)', displayYAxis: false}, '#chart5');
+  drawBarChart([10000, 30000], {title: 'clean numbers', caption: 'input has 1 sig. fig., so animated labels have only 2', backgroundColour: 'rgb(120, 100, 165)', barGapRatio: 0.8}, '#chart6');
+  drawBarChart([10000, 30000.1], {title: 'messy numbers', caption: 'input has 6 sig. figs, so animated labels have 7', backgroundColour: 'rgb(120, 100, 165)', barGapRatio: 0.8}, '#chart7');
+  drawBarChart(Array(10).fill(100), {title: 'and they\'re off!', caption: 'Note how the labels and heights grow at the same rate for each bar. A cute effect.', backgroundColour: 'rgb(172, 136, 112)', displayAxes: false, randomSpeed: true}, '#chart8');
+  drawBarChart(Array(10).fill(100), {title: 'and they\'re off?', caption: 'Note how the labels and heights grow at different rates for each bar. A precious effect, not to be overused.', backgroundColour: 'rgb(124, 112, 100)', displayAxes: false, randomBarSpeed: true, randomHeightLabelSpeed: true}, '#chart9');
+  drawBarChart([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], {title: 'the perils of user customization', titleColour: 'rgb(250, 0, 0)', titleBackgroundColour: 'rgb(0, 150, 0)', titleSize: 25, caption: 'when in doubt, trust the default settings', captionColour: 'rgb(200,230,240)', captionBackgroundColour: 'rgb(240,230,220)', captionSize: 6, defaultBarColour: 'rgb(0,0,30)', labelColourFunction:()=>'rgb('+Math.random()*255+','+Math.random()*255+','+Math.random()*255+')', backgroundColour: 'rgb(24, 12, 30)', randomBarSpeed: true, randomHeightLabelSpeed: true}, '#chart10');
 });
 
 const BAR_CHART_DEFAULTS = {
@@ -21,7 +22,8 @@ const BAR_CHART_DEFAULTS = {
   displayAxes: true,                  // overrides next two options
   displayXAxis: true,
   displayYAxis: true,
-  displayHeights: true,
+  displayHeightLabels: true,
+  labelColourFunction: 'auto',
   animateBars: true,
   animateHeightLabels: true,
   randomSpeed: false,                 // when true, bars and height labels grow at same (random) speed...
@@ -75,7 +77,9 @@ class BarChart {
     this.displayAxes = (typeof options.displayAxes == 'boolean') ? options.displayAxes : BAR_CHART_DEFAULTS.displayAxes;
     this.displayXAxis = this.displayAxes && ((typeof options.displayXAxis == 'boolean') ? options.displayXAxis : BAR_CHART_DEFAULTS.displayXAxis);
     this.displayYAxis = this.displayAxes && ((typeof options.displayYAxis == 'boolean') ? options.displayYAxis : BAR_CHART_DEFAULTS.displayYAxis);
-    this.displayHeights = (typeof options.displayHeights == 'boolean') ? options.displayHeights : BAR_CHART_DEFAULTS.displayHeights;
+    this.displayHeightLabels = (typeof options.displayHeightLabels == 'boolean') ? options.displayHeightLabels : BAR_CHART_DEFAULTS.displayHeightLabels;
+    this.labelColourFunction = options.labelColourFunction || BAR_CHART_DEFAULTS.labelColourFunction;
+    if (this.labelColourFunction == 'auto') { this.labelColourFunction = this.autoLabelColour; }
     
     this.animateBars = (typeof options.animateBars == 'boolean') ? options.animateBars : BAR_CHART_DEFAULTS.animateBars;
     this.animateHeightLabels = (typeof options.animateHeightLabels == 'boolean') ? options.animateHeightLabels : BAR_CHART_DEFAULTS.animateHeightLabels;
@@ -89,7 +93,7 @@ class BarChart {
     if (this.titleColour == 'auto') { this.titleColour = this.calcAutoBarColour(); }  // choose same colour as bars by default
     this.titleBackgroundColour = options.titleBackgroundColour || BAR_CHART_DEFAULTS.titleBackgroundColour;
     if (this.titleBackgroundColour == 'auto') { this.titleBackgroundColour = this.calcAutoBackgroundColour(this.titleColour);}
-    this.titlePadding = this.title ? (options.titlePadding || BAR_CHART_DEFAULTS.titlePadding) : 0;
+    this.titlePadding = this.title ? ((options.titlePadding >= 0) ? options.titlePadding : BAR_CHART_DEFAULTS.titlePadding) : 0;
     
     this.caption = options.caption || BAR_CHART_DEFAULTS.caption;
     this.captionSize = options.captionSize || BAR_CHART_DEFAULTS.captionSize;
@@ -97,7 +101,7 @@ class BarChart {
     if (this.captionColour == 'auto') { this.captionColour = this.titleColour; }      // choose same colour as title (which itself will usually be same as bars)
     this.captionBackgroundColour = options.captionBackgroundColour || BAR_CHART_DEFAULTS.captionBackgroundColour;
     if (this.captionBackgroundColour == 'auto') { this.captionBackgroundColour = this.calcAutoBackgroundColour(this.captionColour); }      // choose same colour as title (which itself will usually be same as bars)
-    this.captionPadding = this.caption ? (options.captionPadding || BAR_CHART_DEFAULTS.captionPadding) : 0;
+    this.captionPadding = this.caption ? ((options.captionPadding >= 0) ? options.captionPadding : BAR_CHART_DEFAULTS.captionPadding) : 0;
   }
 
   draw() {
@@ -189,7 +193,8 @@ class BarChart {
         top: (this.data[i] < 0) ? this.xAxisFromTop : undefined,
         height: this.animateBars ? 0 : this.barHeight(i),
       };
-      this.createRectangle(barId, barOptions);
+      let rect = this.createRectangle(barId, barOptions);
+      rect.click( () => alert(JSON.stringify(this)) );
     }
   }
 
@@ -225,13 +230,12 @@ class BarChart {
       this.createRectangle(axisId, axisOptions);
     }
   }
-
+  
   drawHeightLabels() {
-    if (this.displayHeights) {
-      const lumDiff = 0.75;
+    if (this.displayHeightLabels) {
       for (let i in this.data) {
         let barColour = $( '#' + this.id + '-bar' + i ).css('backgroundColor');
-        let labelColour = this.contrastingShade(barColour, lumDiff);
+        let labelColour = this.labelColourFunction(barColour);
         let labelId = this.id + '-heightLabel' + i;
         let labelOptions = {
           color: labelColour,
@@ -244,7 +248,7 @@ class BarChart {
           textAlign: 'center',
         };
         let rect = this.createRectangle(labelId, labelOptions, this.data[i]);
-        rect.css('left', this.barLeftPos(i) + (this.barWidth - parseFloat(rect.css('width'))) * 0.5);
+        rect.css('left', this.barLeftPos(i) + (this.barWidth - parseFloat(rect.css('width'))) * 0.5);        
       }
     }
   }
@@ -297,7 +301,7 @@ class BarChart {
       step: function() {  // normally the syntax here would be function(now, fx), but since those parameters are unused, ESLint would throw an error
         bar.css('height', Math.pow(this.progress, barSpeed) * targetHeight);
 
-        if (thisChart.displayHeights) {
+        if (thisChart.displayHeightLabels) {
           if (thisChart.data[i] >= 0) {
             label.css('top', thisChart.xAxisFromTop - Math.pow(this.progress, heightLabelSpeed) * targetHeight);
           } else {
@@ -311,7 +315,7 @@ class BarChart {
       },
       always: function() {
         bar.css('height', targetHeight);
-        if (thisChart.displayHeights) {
+        if (thisChart.displayHeightLabels) {
           if (thisChart.data[i] >= 0) {
             label.css('top', thisChart.xAxisFromTop - targetHeight);
           } else {
@@ -429,7 +433,7 @@ class BarChart {
   //  find a nice colour based on background: shift hue (say by 30˚), choose contrasting luminance (say with a lum. difference of 0.5)
   calcAutoBarColour() {
     const HUE_DIFF = 30;
-    const LUM_DIFF = 0.5;
+    const LUM_DIFF = 0.4;
 
     let bg = this.RGBStringToArray(this.backgroundColour);
     let shiftedBg = this.shiftHue(bg, HUE_DIFF);
@@ -446,6 +450,12 @@ class BarChart {
     let lum = this.luminance(col);
     let targetBgLum =  lum + LUM_DIFF * ((lum < 0.5) ? 1 : -1);
     return this.shiftLuminance(this.shiftHue(this.backgroundColour, HUE_DIFF), targetBgLum);
+  }
+
+  // find contrasting colour against bar or chart background (depending on whether label is inside or outside bar)
+  autoLabelColour(bgColour) {
+    const LUM_DIFF = 0.75;
+    return this.contrastingShade(bgColour, LUM_DIFF);
   }
 
   clamp(x, min, max) {
