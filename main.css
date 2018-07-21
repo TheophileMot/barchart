@@ -12,8 +12,9 @@ h1 {
   text-align: center;
   background-color: dimgrey;
   color: lemonchiffon;
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
   width: 50%;
-  line-height: 125px;
+  line-height: 25px;
   margin: auto;
 }
 
@@ -24,7 +25,7 @@ h1 {
 }
 
 .container {
-  width: 80%;
+  width: 90%;
   display: block;
   justify-content: center;
   align-items: center;

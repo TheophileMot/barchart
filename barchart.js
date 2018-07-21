@@ -1,12 +1,13 @@
 $( document ).ready(function() {
   drawBarChart([1, 2, 3], {}, '#chart1');  // this chart will get erased by the next one
-  drawBarChart([-1, -3, -5, -2], {padding: 50, barGapRatio: 0.000001}, '#chart1');
-  drawBarChart([1, 7, 0, 1, 2, 5, -10, 8, 18, 2], {barGapRatio: 0.9, backgroundColourInherit: true}, '#chart2');
-  drawBarChart([13, -8, 5, -3, 2, -1, 1, 0, 1, 1, 2, 3, 5, 8, 13], {backgroundColour: 'rgb(125, 200, 237)', displayXAxis: false}, '#chart3');
+  drawBarChart([[-1, 'a'], [-3, 'b'], [-5, 'c'], [-2, 'd']], {padding: 50, barGapRatio: 0.000001}, '#chart1');
+  drawBarChart([1, 7, 0, 1, 2, 5, -10, 8, 18, 2], {barGapRatio: 0.9, backgroundColourInherit: true, displayHeights: false}, '#chart2');
+  drawBarChart([13, -8, 5, -3, 2, -1, 1, 0, 1, 1, 2, 3, 5, 8, 13], {backgroundColour: 'rgb(125, 200, 237)', displayXAxis: false, barGapRatio: 0.8}, '#chart3');
   drawBarChart([0, 1, 8, 27, 64], {backgroundColour: 'rgb(175, 35, 65)', displayXAxis: false, displayYAxis: false}, '#chart4');
-  drawBarChart([1, 2, 3, 2, 3, 1, 3, 2, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2], {backgroundColour: 'rgb(60, 180, 140)', padding: 25, animateBars: false}, '#chart5');
-  drawBarChart([1, 3], {backgroundColour: 'rgb(200, 100, 5)', barGapRatio: 0.4}, '#chart6');
-  drawBarChart([10, 33, 23, 64, 92, 25], {backgroundColour: 'rgb(240, 180, 250)', barGapRatio: 0.75}, '#chart7');
+  drawBarChart([1, 2, 3, 2, 3, 1, 3, 2, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 2, 3, 1, 3, 2, 3, 2, 1, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2], {backgroundColour: 'rgb(60, 180, 140)', padding: 25, animateBars: false, displayHeights: false}, '#chart5');
+  drawBarChart([10000, 30000], {backgroundColour: 'rgb(200, 100, 5)', barGapRatio: 0.8}, '#chart6');
+  drawBarChart([10000, 30000.1], {backgroundColour: 'rgb(200, 100, 5)', barGapRatio: 0.8}, '#chart7');
+  drawBarChart([105.4, 53.33, 23.12, 64.5, 92.31, 25.1], {backgroundColour: 'rgb(24, 21, 25)', barGapRatio: 0.75}, '#chart8');
 });
 
 const BAR_CHART_DEFAULTS = {
@@ -30,6 +31,10 @@ class BarChart {
 
     this.data = data;
     this.element = element;
+
+    // see how many sig. figs there are in data; to be used while animating height labels
+    this.dataPrecision = this.precision(data);
+    this.dataDecimalPlaces = this.decimalPlaces(data);
 
     // set options according to user or defaults
     if (!options.backgroundColourInherit) { $( element ).css('background-color', options.backgroundColour || BAR_CHART_DEFAULTS.backgroundColour); }
@@ -64,6 +69,7 @@ class BarChart {
     this.drawBars();
     this.drawAxes();
     this.drawHeightLabels();
+    this.animate();
   }
 
   drawBars() {
@@ -79,30 +85,6 @@ class BarChart {
         height: this.animateBars ? 0 : this.barHeight(i),
       };
       this.createRectangle(barId, barOptions);
-
-      if (this.animateBars) {
-        // store some values for reference later, since scope of 'this' changes in jQuery animation
-        let displayHeights = this.displayHeights;
-        let labelId = this.id + '-heightLabel' + i;
-        let xAxisFromTop = this.xAxisFromTop;
-        let xAxisFromBottom = this.xAxisFromBottom;
-        let data = this.data[i];
-
-        $( '#' + barId ).animate({
-          height: this.barHeight(i),
-        }, {
-          duration: 2000,
-          step: function(now, fx) {
-            if (displayHeights) {
-              if  (data >= 0) {
-                $( '#' + labelId ).css('top', xAxisFromTop - now);
-              } else {
-                $( '#' + labelId ).css('bottom', xAxisFromBottom - now);
-              }
-            }
-          }
-        });
-      }
     }
   }
 
@@ -162,6 +144,63 @@ class BarChart {
     }
   }
 
+  animate() {
+    if (this.animateBars) {
+      for (let i in this.data) {
+        this.animateBar(i);
+      }
+    }
+  }
+
+  animateBar(i) {
+    // store some values for reference later, since scope of 'this' changes in jQuery animation
+    let displayHeights = this.displayHeights;
+    let barId = this.id + '-bar' + i;
+    let bar = $( '#' + barId );
+    let labelId = this.id + '-heightLabel' + i;
+    let label = $( '#' + labelId );
+    let xAxisFromTop = this.xAxisFromTop;
+    let xAxisFromBottom = this.xAxisFromBottom;
+    let data = this.data[i];
+    let dataPrecision = this.dataPrecision;
+    let dataDecimalPlaces = this.dataDecimalPlaces;
+    let setPrecisionAndPlaces = this.setPrecisionAndPlaces;
+
+    let targetHeight = this.barHeight(i);
+
+    bar.animate({
+      progress: 1,  // fake property that transitions from 0 to 1; use it to calculate height, labels, etc.
+    }, {
+      duration: 2000,
+      step: function() {  // normally the syntax here would be function(now, fx), but since those parameters are unused, ESLint would throw an error
+        bar.css('height', this.progress * targetHeight);
+
+        if (displayHeights) {
+          if (data >= 0) {
+            label.css('top', xAxisFromTop - this.progress * targetHeight);
+          } else {
+            label.css('bottom', xAxisFromBottom - this.progress * targetHeight);
+          }
+          // if animating numbers on labels, try to keep roughly same level of information: allow one more significant figure, but don't use more decimal place
+          label.html(setPrecisionAndPlaces(this.progress * data, dataPrecision + 1, dataDecimalPlaces));
+        }
+      },
+      always: function() {
+        bar.css('height', targetHeight);
+        if (displayHeights) {
+          if (data >= 0) {
+            label.css('top', xAxisFromTop - targetHeight);
+          } else {
+            label.css('bottom', xAxisFromBottom - targetHeight);
+          }
+          // if animating numbers on labels, try to keep roughly same level of information: allow one more significant figure, but don't use more decimal place
+          label.html(data);
+        }
+      }
+    });
+  }
+
+
   // determine left side of ith bar in pixels. If displaying y-axis, account for extra gap that is added before first bar.
   barLeftPos(i) {
     return this.padding + i * this.barSpacing + (this.displayYAxis ? (1 - this.barGapRatio) * this.barSpacing : 0);
@@ -186,6 +225,45 @@ class BarChart {
       rect.css(option, cssOptions[option]);
     }
     return rect;  // to offer a convenient reference after creation
+  }
+
+  // calculate how many significant figures (ignoring trailing zeroes) are in number or array: e.g., -0.03140 has 3 sig. figs
+  precision(data) {
+    if (typeof data == 'number') {
+      let str = data.toString().replace(/[-.]/g,'');  // erase negative sign and decimal point
+      str = str.replace(/^0*|0*$/g, '');             // erase leading/trailing zeroes
+      return str.length;
+    } else if (typeof data == 'string') { // 'precision' of strings (e.g., data labels) is 0, so it won't affect precision of data array
+      return 0;
+    } else {  // data is an array; return max precision of its elements
+      return Math.max(...data.map( x => this.precision(x) ));
+    }
+  }
+
+  // calculate how many digits are used after decimal point in number or array
+  decimalPlaces(data) {
+    if (typeof data == 'number') {
+      let str = data.toString();
+      let decimalPoint = str.indexOf('.');
+      if (decimalPoint == -1) {
+        return 0;
+      } else {
+        return str.slice(decimalPoint + 1).length;
+      }
+    } else if (typeof data == 'string') { // 'precision' of strings (e.g., data labels) is 0, so it won't affect precision of data array
+      return 0;
+    } else {  // data is an array; return max precision of its elements
+      return Math.max(...data.map( x => this.decimalPlaces(x) ));
+    }
+  }
+  
+  // round a number to given level of sig. figs, but without exceeding given number of places after decimal point
+  setPrecisionAndPlaces(x, precision, decimalPlaces) {
+    if  (x == 0) {
+      return x;
+    } else {
+      return parseFloat(parseFloat(x.toPrecision(precision)).toFixed(decimalPlaces));
+    }
   }
 
   // create ID using random string of hexadecimal characters
@@ -224,7 +302,7 @@ class BarChart {
     return this.height / heightDiff;
   }
 
-  //  find a nice colour based on background: shift hue (say by 60˚), choose contrasting luminance (say with a lum. difference of 0.5)
+  //  find a nice colour based on background: shift hue (say by 30˚), choose contrasting luminance (say with a lum. difference of 0.5)
   calcAutoBarColour() {
     const hueShift = 30;
     const lumDiff = 0.5;
@@ -356,4 +434,3 @@ function drawBarChart(data, options, element) {
 
   barChart.draw();
 }
-
