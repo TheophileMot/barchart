@@ -1,13 +1,14 @@
 $( document ).ready(function() {
-  drawBarChart([1, 2, 3], {}, '#chart1');  // this chart will get erased by the next one
-  drawBarChart([[-1, 'a'], [-3, 'b'], [-5, 'c'], [-2, 'd']], {padding: 50, barGapRatio: 0.000001, caption: 'heyo'}, '#chart1');
-  drawBarChart([1, 7, 0, 1, 2, 5, -10, 8, 18, 2], {barGapRatio: 0.9, backgroundColourInherit: true, displayHeights: false}, '#chart2');
-  drawBarChart([13, -8, 5, -3, 2, -1, 1, 0, 1, 1, 2, 3, 5, 8, 13], {backgroundColour: 'rgb(125, 200, 237)', displayXAxis: false, barGapRatio: 0.8, animateHeightLabels: false}, '#chart3');
+  drawBarChart([1, 2, 3], {caption: 'you won\'t see this'}, '#chart1');  // this chart will get erased by the next one
+  //drawBarChart([[-1, 'a'], [-3, 'b'], [-5, 'c'], [-2, 'd']], {padding: 50, barGapRatio: 0.000001, caption: 'to do: add bar labels'}, '#chart1');
+  drawBarChart([-1, -3, -5, -2], {padding: 50, barGapRatio: 0.000001, caption: 'previous chart here was automatically erased (see source)'}, '#chart1');
+  drawBarChart([1, 7, 0, 1, 2, 5, -10, 8, 18, 2], {barGapRatio: 0.9, backgroundColourInherit: true, displayHeights: false, caption: 'background colour inherited from page CSS (as opposed to bar chart defaults)'}, '#chart2');
+  drawBarChart([13, -8, 5, -3, 2, -1, 1, 0, 1, 1, 2, 3, 5, 8, 13], {backgroundColour: 'rgb(125, 200, 237)', displayXAxis: false, barGapRatio: 0.8, animateHeightLabels: false, caption: 'these numbers don\'t animate', title: 'Fibonacci numbers can go backwards too', titleSize: 25, titleColour: 'rgb(0,0,0)'}, '#chart3');
   drawBarChart([0, 1, 8, 27, 64], {backgroundColour: 'rgb(175, 35, 65)', displayXAxis: false, displayYAxis: false}, '#chart4');
   drawBarChart([1, 2, 3, 2, 3, 1, 3, 2, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 2, 3, 1, 3, 2, 3, 2, 1, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2], {backgroundColour: 'rgb(60, 180, 140)', barGapRatio: 0, padding: 0, animateBars: false, displayHeights: false}, '#chart5');
   drawBarChart([10000, 30000], {backgroundColour: 'rgb(200, 100, 5)', barGapRatio: 0.8}, '#chart6');
   drawBarChart([10000, 30000.1], {backgroundColour: 'rgb(200, 100, 5)', barGapRatio: 0.8}, '#chart7');
-  drawBarChart([105.4, 53.33, 23.12, 64.5, 92.31, 25.1], {backgroundColour: 'rgb(24, 21, 25)', barGapRatio: 0.75}, '#chart8');
+  drawBarChart([105.4, 0, 53.33, 23.12, 64.5, 92.31, 25.1], {backgroundColour: 'rgb(124, 21, 25)'}, '#chart8');
 });
 
 const BAR_CHART_DEFAULTS = {
@@ -21,7 +22,16 @@ const BAR_CHART_DEFAULTS = {
   displayHeights: true,
   animateBars: true,
   animateHeightLabels: true,
+  title: '',
+  titleSize: 20,
+  titleColour: 'auto',
+  titleBackgroundColour: 'auto',
+  titlePadding: 25,
   caption: '',
+  captionSize: 15,
+  captionColour: 'auto',
+  captionBackgroundColour: 'auto',
+  captionPadding: 10,
 };
 
 class BarChart {
@@ -42,7 +52,7 @@ class BarChart {
 
     // set primary properties (from user input or defaults), then secondary properties (derived from primary)
     this.setPrimaryProperties();
-    this.setSecondaryProperties();
+    //this.setSecondaryProperties();
   }
 
   setPrimaryProperties() {
@@ -62,7 +72,73 @@ class BarChart {
     this.displayHeights = (typeof options.displayHeights == 'boolean') ? options.displayHeights : BAR_CHART_DEFAULTS.displayHeights;
     this.animateBars = (typeof options.animateBars == 'boolean') ? options.animateBars : BAR_CHART_DEFAULTS.animateBars;
     this.animateHeightLabels = (typeof options.animateHeightLabels == 'boolean') ? options.animateHeightLabels : BAR_CHART_DEFAULTS.animateHeightLabels;
+
+    this.title = options.title || BAR_CHART_DEFAULTS.title;
+    this.titleSize = options.titleSize || BAR_CHART_DEFAULTS.titleSize;
+    this.titleColour = options.titleColour || BAR_CHART_DEFAULTS.titleColour;
+    if (this.titleColour == 'auto') { this.titleColour = this.calcAutoBarColour(); }  // choose same colour as bars by default
+    this.titleBackgroundColour = options.titleBackgroundColour || BAR_CHART_DEFAULTS.titleBackgroundColour;
+    if (this.titleBackgroundColour == 'auto') { this.titleBackgroundColour = this.calcAutoBackgroundColour(this.titleColour);}
+    this.titlePadding = this.title ? (options.titlePadding || BAR_CHART_DEFAULTS.titlePadding) : 0;
+    
     this.caption = options.caption || BAR_CHART_DEFAULTS.caption;
+    this.captionSize = options.captionSize || BAR_CHART_DEFAULTS.captionSize;
+    this.captionColour = options.captionColour || BAR_CHART_DEFAULTS.captionColour;
+    if (this.captionColour == 'auto') { this.captionColour = this.titleColour; }      // choose same colour as title (which itself will usually be same as bars)
+    this.captionBackgroundColour = options.captionBackgroundColour || BAR_CHART_DEFAULTS.captionBackgroundColour;
+    if (this.captionBackgroundColour == 'auto') { this.captionBackgroundColour = this.calcAutoBackgroundColour(this.captionColour); }      // choose same colour as title (which itself will usually be same as bars)
+    this.captionPadding = this.caption ? (options.captionPadding || BAR_CHART_DEFAULTS.captionPadding) : 0;
+  }
+
+  draw() {
+    this.drawTitle();
+    this.drawCaption();
+    this.setSecondaryProperties();
+
+    this.drawBars();
+    this.drawAxes();
+    this.drawHeightLabels();
+    this.animate();
+  }
+  
+  drawTitle() {
+    let titleId = this.id + '-title';
+
+    let titleOptions = {
+      color: this.titleColour,
+      backgroundColor: this.titleBackgroundColour,
+      fontSize: this.titleSize,
+      position: 'absolute',
+      textAlign: 'center',
+      left: 0,
+      top: 0,
+      width: $( this.element ).width(),
+      padding: this.titlePadding,
+      boxSizing: 'border-box',  // so that padding doesn't make DIV grow
+    };
+    let contents = this.title;
+
+    this.createRectangle(titleId, titleOptions, contents);
+  }
+
+  drawCaption() {
+    let captionId = this.id + '-caption';
+
+    let captionOptions = {
+      color: this.captionColour,
+      backgroundColor: this.captionBackgroundColour,
+      fontSize: this.captionSize,
+      position: 'absolute',
+      textAlign: 'center',
+      left: 0,
+      bottom: 0,
+      width: $( this.element ).width(),
+      padding: this.captionPadding,
+      boxSizing: 'border-box',  // so that padding doesn't make DIV grow
+    };
+    let contents = this.caption;
+
+    this.createRectangle(captionId, captionOptions, contents);
   }
 
   setSecondaryProperties() {
@@ -71,25 +147,24 @@ class BarChart {
     // properties derived from colours
     this.axisBackgroundColour = this.contrastingShade(this.backgroundColour, 0.25);
 
+    // dimensions of title and caption
+    this.titleWidth = $( '#' + this.id + '-title').outerWidth();
+    this.titleHeight = $( '#' + this.id + '-title').outerHeight();
+    this.captionWidth = $( '#' + this.id + '-caption').outerWidth();
+    this.captionHeight = $( '#' + this.id + '-caption').outerHeight();
+
     // dimensions of chart, excluding padding
-    this.width = $( element ).width() - 2 * this.padding;
-    this.height = $( element ).height() - 2 * this.padding;
+    this.chartWidth = $( element ).width() - 2 * this.padding;
+    this.chartHeight = $( element ).height() - 2 * this.padding - this.titleHeight - this.captionHeight;
 
     // properties derived from dimensions
     this.barSpacing = this.calcBarSpacing();
     this.barWidth = Math.ceil(Math.max(1, this.barSpacing * this.barGapRatio));
     this.maxHeight = Math.max(0, ...this.data);
     this.minHeight = Math.min(0, ...this.data);
-    this.verticalScale = this.calcVerticalScale(element);
-    this.xAxisFromBottom = this.padding + (-this.minHeight) * this.verticalScale;
-    this.xAxisFromTop = this.padding + this.maxHeight * this.verticalScale;
-  }
-  
-  draw() {
-    this.drawBars();
-    this.drawAxes();
-    this.drawHeightLabels();
-    this.animate();
+    this.verticalScale = this.calcVerticalScale();
+    this.xAxisFromBottom = this.padding + (-this.minHeight) * this.verticalScale + this.captionHeight;
+    this.xAxisFromTop = this.padding + this.maxHeight * this.verticalScale + this.titleHeight;
   }
 
   drawBars() {
@@ -118,8 +193,8 @@ class BarChart {
       let axisOptions = {
         position: 'absolute',
         left: this.padding,
-        width: this.width,
-        bottom: this.xAxisFromBottom,
+        width: this.chartWidth,
+        bottom: this.yTransform(0), // == this.xAxisFromBottom
         height: 1,
         backgroundColor: axisColour,
       };
@@ -133,8 +208,8 @@ class BarChart {
         position: 'absolute',
         left: this.padding,
         width: 1,
-        bottom: this.padding,
-        height: this.height,
+        bottom: this.yTransform(this.minHeight),
+        height: this.chartHeight,
         backgroundColor: axisColour,
       };
       this.createRectangle(axisId, axisOptions);
@@ -161,6 +236,13 @@ class BarChart {
         let rect = this.createRectangle(labelId, labelOptions, this.data[i]);
         rect.css('left', this.barLeftPos(i) + (this.barWidth - parseFloat(rect.css('width'))) * 0.5);
       }
+    }
+  }
+
+  yTransform(y, fromTop) {
+    if (fromTop) {  // measure downwards
+    } else {        // measure upwards (default)
+      return y * this.verticalScale + this.xAxisFromBottom;
     }
   }
 
@@ -304,9 +386,9 @@ class BarChart {
   //    - if drawing axes, put an extra gap before and after, so (#bars) units followed by a gap
   calcBarSpacing() {
     if (this.displayYAxis) {
-      return this.width / (this.data.length + 1 - this.barGapRatio);
+      return this.chartWidth / (this.data.length + 1 - this.barGapRatio);
     } else {
-      return this.width / (this.data.length - 1 + this.barGapRatio);
+      return this.chartWidth / (this.data.length - 1 + this.barGapRatio);
     }
   }
 
@@ -314,21 +396,29 @@ class BarChart {
   //    - if all bars are positive (resp. negative), the lowest (resp. greatest) height is 0
   calcVerticalScale() {
     let heightDiff = this.maxHeight - this.minHeight || 1;  // avoid division by zero
-    return this.height / heightDiff;
+    return this.chartHeight / heightDiff;
   }
 
   //  find a nice colour based on background: shift hue (say by 30˚), choose contrasting luminance (say with a lum. difference of 0.5)
   calcAutoBarColour() {
-    const hueShift = 30;
-    const lumDiff = 0.5;
+    const HUE_DIFF = 30;
+    const LUM_DIFF = 0.5;
 
     let bg = this.RGBStringToArray(this.backgroundColour);
-    let hsv = this.RGBtoHSV(bg);
-    hsv[0] = (hsv[0] + hueShift) % 360;
+    let shiftedBg = this.shiftHue(bg, HUE_DIFF);
 
     let lum = this.luminance(bg);
-    let targetLum = lum + lumDiff * ((lum < 0.5) ? 1 : -1);
-    return this.RGBArrayToString(this.shiftLuminance(this.HSVtoRGB(hsv), targetLum));
+    let targetLum = lum + LUM_DIFF * ((lum < 0.5) ? 1 : -1);
+    return this.RGBArrayToString(this.shiftLuminance(shiftedBg, targetLum));
+  }
+
+  calcAutoBackgroundColour(col) {
+    const HUE_DIFF = -60;
+    const LUM_DIFF = 0.75;
+
+    let lum = this.luminance(col);
+    let targetBgLum =  lum + LUM_DIFF * ((lum < 0.5) ? 1 : -1);
+    return this.shiftLuminance(this.shiftHue(this.backgroundColour, HUE_DIFF), targetBgLum);
   }
 
   clamp(x, min, max) {
@@ -340,8 +430,9 @@ class BarChart {
   //  --------------------------
   
   // extract RGB array from CSS, e.g., 'rgb(0, 255, 255)' to [0, 255, 255]
+  //   - must be in rgb format, i.e., doesn't work with named colours
   RGBStringToArray(str) {
-    let rgb = str.replace(/[rgb()]/g, '').split(', ');
+    let rgb = str.replace(/[rgb()]/g, '').split(',');
     rgb = rgb.map(n => parseInt(n));
     return rgb;
   }
@@ -401,11 +492,19 @@ class BarChart {
 
   // calculate luminance on scale of 0 to 1. Luminance can be approximated as 0.30r + 0.59g + 0.11b (the human eye is sensitive to green but not blue)
   luminance(rgb) {
+    if (typeof rgb == 'string') { // input is string: convert to array
+      return this.luminance(this.RGBStringToArray(rgb));
+    }
+
     return (0.3 * rgb[0] + 0.59 * rgb[1] + 0.11 * rgb[2]) / 255;
   }
 
   // find tint or shade with given luminance; retain hue
   shiftLuminance(rgb, targetLum) {
+    if (typeof rgb == 'string') { // input and output are strings: convert to array and back
+      return this.RGBArrayToString(this.shiftLuminance(this.RGBStringToArray(rgb), targetLum));
+    }
+
     let shiftedRGB;
 
     targetLum = this.clamp(targetLum, 0, 1);
@@ -420,6 +519,18 @@ class BarChart {
     shiftedRGB = shiftedRGB.map( x => this.clamp(x, 0, 255) );
 
     return shiftedRGB;
+  }
+
+  // N.B. this will affect luminance
+  shiftHue(rgb, hueDiff) {
+    if (typeof rgb == 'string') { // input and output are strings: convert to array and back
+      return this.RGBArrayToString(this.shiftHue(this.RGBStringToArray(rgb), hueDiff));
+    }
+
+    let hsv = this.RGBtoHSV(rgb);
+    hsv[0] = (hsv[0] + hueDiff) % 360;
+
+    return this.HSVtoRGB(hsv);
   }
 
   // find a contrasting tint or shade, retaining hue. In particular, find colour that differs in luminance by lumDiff (between 0 and 1).
