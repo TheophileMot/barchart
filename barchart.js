@@ -3,11 +3,11 @@ $( document ).ready(function() {
   //drawBarChart([[-1, 'a'], [-3, 'b'], [-5, 'c'], [-2, 'd']], {padding: 50, barGapRatio: 0.000001, caption: 'to do: add bar labels'}, '#chart1');
   drawBarChart([-8, -13, -5, -2, -19, -3, -1, -4], {displayHeightLabels: false, displayAxes: false, padding: 5, barGapRatio: 0.000001, caption: '<p>previous chart here was automatically erased (see source)</p><p>and now there are some very slow thin lines: bar-to-gap ratio is <em>almost</em> 0</p><p>perhaps it is raining</p>', captionSize: 12, animationLength: 20000, randomSpeed: true}, '#chart1');
   drawBarChart([1, 7, 0, 1, 2, 5, -10, 8, 18, 2], {barGapRatio: 0.9, backgroundColourInherit: true, displayHeightLabels: false, caption: 'background colour inherited from page CSS (as opposed to bar chart defaults)', animationLength: 500}, '#chart2');
-  drawBarChart([13, -8, 5, -3, 2, -1, 1, 0, 1, 1, 2, 3, 5, 8, 13], {backgroundColour: 'rgb(162, 152, 112)', displayAxes: false, barGapRatio: 0.8, animateHeightLabels: false, caption: 'these number labels don\'t animate', captionPadding: 0, title: 'Fibonacci numbers can go backwards too', titleSize: 15, titlePadding: 0, titleColour: 'rgb(0,50,0)'}, '#chart3');
+  drawBarChart([13, -8, 5, -3, 2, -1, 1, 0, 1, 1, 2, 3, 5, 8, 13], {backgroundColour: 'rgb(162, 152, 112)', displayAxes: false, barGapRatio: 0.8, animateHeightLabels: false, caption: 'these number labels don\'t change during the animation', captionPadding: 0, titleSize: 15, titlePadding: 0, titleColour: 'rgb(0,50,0)'}, '#chart3');
   drawBarChart([1, 2, 3, 2, 3, 1, 3, 2, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 2, 3, 1, 3, 2, 3, 2, 1, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2], {backgroundColour: 'rgb(60, 180, 140)', barGapRatio: 0, padding: 0, animateBars: false, displayHeightLabels: false}, '#chart4');
-  drawBarChart([0, 1, 8, 27, 64], {title: 'whole numbers', caption: 'even though some inputs have 2 sig. figs, all inputs are integers: thus, animated numbers are restricted to integers as well (so we won\'t see 1.5, say, even though it has only 2 sig. figs)', captionSize: 12, captionPadding: 2, backgroundColour: 'rgb(175, 35, 65)', displayYAxis: false}, '#chart5');
-  drawBarChart([10000, 30000], {title: 'clean numbers', caption: 'input has 1 sig. fig., so animated labels have only 2', backgroundColour: 'rgb(120, 100, 165)', barGapRatio: 0.8}, '#chart6');
-  drawBarChart([10000, 30000.1], {title: 'messy numbers', caption: 'input has 6 sig. figs, so animated labels have 7', backgroundColour: 'rgb(120, 100, 165)', barGapRatio: 0.8}, '#chart7');
+  drawBarChart([0, 1, 8, 27, 64], {title: 'whole numbers', caption: 'even though some inputs have 2 sig. figs, all inputs are integers: thus, animated numbers are restricted to integers as well (so we won\'t see 0.9, say, even though it has only 1 sig. fig.)', captionSize: 12, captionPadding: 2, backgroundColour: 'rgb(175, 35, 65)', displayYAxis: false}, '#chart5');
+  drawBarChart([10000, 30000], {title: 'clean numbers', caption: 'input has 1 sig. fig., so animated labels have only up to 2', backgroundColour: 'rgb(120, 100, 165)', barGapRatio: 0.8}, '#chart6');
+  drawBarChart([10000, 30000.1], {title: 'messy numbers', caption: 'input has 6 sig. figs, so animated labels have up to 7', backgroundColour: 'rgb(120, 100, 165)', barGapRatio: 0.8}, '#chart7');
   drawBarChart(Array(10).fill(100), {title: 'and they\'re off!', caption: 'Note how the labels and heights of each bar grow at the same random rate. A cute effect.', backgroundColour: 'rgb(162, 146, 122)', displayAxes: false, randomSpeed: true}, '#chart8');
   drawBarChart(Array(10).fill(100), {title: 'and they\'re off?', caption: 'Note how the labels and heights of each bar grow at different random rates. A precious effect, not to be overused.', backgroundColour: 'rgb(164, 132, 110)', displayAxes: false, randomBarSpeed: true, randomHeightLabelSpeed: true}, '#chart9');
   drawBarChart([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], {title: 'the perils of user customization', titleColour: 'rgb(250, 0, 0)', titleBackgroundColour: 'rgb(0, 150, 0)', titleSize: 25, caption: 'when in doubt, trust the default settings', captionColour: 'rgb(200,230,240)', captionBackgroundColour: 'rgb(240,230,220)', captionSize: 6, defaultBarColour: 'rgb(0,0,30)', labelColourFunction:()=>'rgb('+Math.random()*255+','+Math.random()*255+','+Math.random()*255+')', backgroundColour: 'rgb(24, 12, 30)', randomBarSpeed: true, randomHeightLabelSpeed: true}, '#chart10');
@@ -57,7 +57,6 @@ class BarChart {
 
     // see how many sig. figs there are in data; to be used while animating height labels
     this.dataPrecision = this.precision(data);
-    this.dataDecimalPlaces = this.decimalPlaces(data);
 
     // set primary properties (from user input or defaults), then secondary properties (derived from primary)
     this.setPrimaryProperties();
@@ -252,7 +251,7 @@ class BarChart {
           textAlign: 'center',
         };
         let rect = this.createRectangle(labelId, labelOptions, this.data[i]);
-        rect.css('left', this.barLeftPos(i) + (this.barWidth - parseFloat(rect.css('width'))) * 0.5);        
+        rect.css('left', this.barLeftPos(i) + (this.barWidth - parseFloat(rect.css('width'))) * 0.5);
       }
     }
   }
@@ -311,9 +310,9 @@ class BarChart {
           } else {
             label.css('bottom', thisChart.xAxisFromBottom - Math.pow(this.progress, heightLabelSpeed) * targetHeight);
           }
-          // if animating numbers on labels, try to keep roughly same level of information: allow one more significant figure, but don't use more decimal place
+          // if animating numbers on labels, try to keep roughly same level of information: allow one more significant figure than max in all data, but don't use more decimal places than current bar
           if (thisChart.animateHeightLabels) {
-            label.html(thisChart.setPrecisionAndPlaces(this.progress * thisChart.data[i], thisChart.dataPrecision + 1, thisChart.dataDecimalPlaces));
+            label.html(thisChart.setPrecisionAndPlaces(this.progress * thisChart.data[i], thisChart.dataPrecision + 1, thisChart.decimalPlaces(thisChart.data[i])));
           }
         }
       },
