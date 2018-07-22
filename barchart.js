@@ -1,16 +1,17 @@
 $( document ).ready(function() {
-  drawBarChart([1, 2, 3], {caption: 'you won\'t see this'}, '#chart1');  // this chart will get erased by the next one
+  //drawBarChart([1, 2, 3], {caption: 'you won\'t see this'}, '#chart1');  // this chart will get erased by the next one
   //drawBarChart([[-1, 'a'], [-3, 'b'], [-5, 'c'], [-2, 'd']], {padding: 50, barGapRatio: 0.000001, caption: 'to do: add bar labels'}, '#chart1');
-  drawBarChart([-1, -3, -5, -2], {displayHeightLabels: false, displayAxes: false, padding: 50, barGapRatio: 0.000001, caption: '<p>previous chart here was automatically erased</p><p>(see source)</p>'}, '#chart1');
-  drawBarChart([1, 7, 0, 1, 2, 5, -10, 8, 18, 2], {barGapRatio: 0.9, backgroundColourInherit: true, displayHeightLabels: false, caption: 'background colour inherited from page CSS (as opposed to bar chart defaults)'}, '#chart2');
+  drawBarChart([-8, -13, -5, -2, -19, -3, -1, -4], {displayHeightLabels: false, displayAxes: false, padding: 5, barGapRatio: 0.000001, caption: '<p>previous chart here was automatically erased (see source)</p><p>and now there are some very slow thin lines: bar-to-gap ratio is <em>almost</em> 0</p><p>perhaps it is raining</p>', captionSize: 12, animationLength: 20000, randomSpeed: true}, '#chart1');
+  drawBarChart([1, 7, 0, 1, 2, 5, -10, 8, 18, 2], {barGapRatio: 0.9, backgroundColourInherit: true, displayHeightLabels: false, caption: 'background colour inherited from page CSS (as opposed to bar chart defaults)', animationLength: 500}, '#chart2');
   drawBarChart([13, -8, 5, -3, 2, -1, 1, 0, 1, 1, 2, 3, 5, 8, 13], {backgroundColour: 'rgb(162, 152, 112)', displayAxes: false, barGapRatio: 0.8, animateHeightLabels: false, caption: 'these number labels don\'t animate', captionPadding: 0, title: 'Fibonacci numbers can go backwards too', titleSize: 15, titlePadding: 0, titleColour: 'rgb(0,50,0)'}, '#chart3');
   drawBarChart([1, 2, 3, 2, 3, 1, 3, 2, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 2, 3, 1, 3, 2, 3, 2, 1, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2], {backgroundColour: 'rgb(60, 180, 140)', barGapRatio: 0, padding: 0, animateBars: false, displayHeightLabels: false}, '#chart4');
   drawBarChart([0, 1, 8, 27, 64], {title: 'whole numbers', caption: 'even though some inputs have 2 sig. figs, all inputs are integers: thus, animated numbers are restricted to integers as well (so we won\'t see 1.5, say, even though it has only 2 sig. figs)', captionSize: 12, captionPadding: 2, backgroundColour: 'rgb(175, 35, 65)', displayYAxis: false}, '#chart5');
   drawBarChart([10000, 30000], {title: 'clean numbers', caption: 'input has 1 sig. fig., so animated labels have only 2', backgroundColour: 'rgb(120, 100, 165)', barGapRatio: 0.8}, '#chart6');
   drawBarChart([10000, 30000.1], {title: 'messy numbers', caption: 'input has 6 sig. figs, so animated labels have 7', backgroundColour: 'rgb(120, 100, 165)', barGapRatio: 0.8}, '#chart7');
-  drawBarChart(Array(10).fill(100), {title: 'and they\'re off!', caption: 'Note how the labels and heights grow at the same rate for each bar. A cute effect.', backgroundColour: 'rgb(172, 136, 112)', displayAxes: false, randomSpeed: true}, '#chart8');
-  drawBarChart(Array(10).fill(100), {title: 'and they\'re off?', caption: 'Note how the labels and heights grow at different rates for each bar. A precious effect, not to be overused.', backgroundColour: 'rgb(124, 112, 100)', displayAxes: false, randomBarSpeed: true, randomHeightLabelSpeed: true}, '#chart9');
+  drawBarChart(Array(10).fill(100), {title: 'and they\'re off!', caption: 'Note how the labels and heights of each bar grow at the same random rate. A cute effect.', backgroundColour: 'rgb(162, 146, 122)', displayAxes: false, randomSpeed: true}, '#chart8');
+  drawBarChart(Array(10).fill(100), {title: 'and they\'re off?', caption: 'Note how the labels and heights of each bar grow at different random rates. A precious effect, not to be overused.', backgroundColour: 'rgb(164, 132, 110)', displayAxes: false, randomBarSpeed: true, randomHeightLabelSpeed: true}, '#chart9');
   drawBarChart([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], {title: 'the perils of user customization', titleColour: 'rgb(250, 0, 0)', titleBackgroundColour: 'rgb(0, 150, 0)', titleSize: 25, caption: 'when in doubt, trust the default settings', captionColour: 'rgb(200,230,240)', captionBackgroundColour: 'rgb(240,230,220)', captionSize: 6, defaultBarColour: 'rgb(0,0,30)', labelColourFunction:()=>'rgb('+Math.random()*255+','+Math.random()*255+','+Math.random()*255+')', backgroundColour: 'rgb(24, 12, 30)', randomBarSpeed: true, randomHeightLabelSpeed: true}, '#chart10');
+  drawBarChart([7, 3, 2.8765, 1, -0.01], {backgroundColour: 'rgb(255, 255, 0)', title: 'pure yellow is hard to work with...', caption: '...but the default settings still do a decent job'}, '#chart11');
 });
 
 const BAR_CHART_DEFAULTS = {
@@ -26,6 +27,7 @@ const BAR_CHART_DEFAULTS = {
   labelColourFunction: 'auto',
   animateBars: true,
   animateHeightLabels: true,
+  animationLength: 2000,
   randomSpeed: false,                 // when true, bars and height labels grow at same (random) speed...
   randomBarSpeed: false,              // ... whereas this line and the next make independent random speeds
   randomHeightLabelSpeed: false,
@@ -83,6 +85,7 @@ class BarChart {
     
     this.animateBars = (typeof options.animateBars == 'boolean') ? options.animateBars : BAR_CHART_DEFAULTS.animateBars;
     this.animateHeightLabels = (typeof options.animateHeightLabels == 'boolean') ? options.animateHeightLabels : BAR_CHART_DEFAULTS.animateHeightLabels;
+    this.animationLength = options.animationLength || BAR_CHART_DEFAULTS.animationLength;
     this.randomSpeed = (typeof options.randomSpeed == 'boolean') ? options.randomSpeed : BAR_CHART_DEFAULTS.randomSpeed;
     this.randomBarSpeed = (typeof options.randomBarSpeed == 'boolean') ? options.randomBarSpeed : BAR_CHART_DEFAULTS.randomBarSpeed;
     this.randomHeightLabelSpeed = (typeof options.randomHeightLabelSpeed == 'boolean') ? options.randomHeightLabelSpeed : BAR_CHART_DEFAULTS.randomHeightLabelSpeed;
@@ -235,7 +238,8 @@ class BarChart {
     if (this.displayHeightLabels) {
       for (let i in this.data) {
         let barColour = $( '#' + this.id + '-bar' + i ).css('backgroundColor');
-        let labelColour = this.labelColourFunction(barColour);
+        let labelColour = this.labelColourFunction(barColour, this.backgroundColour);
+
         let labelId = this.id + '-heightLabel' + i;
         let labelOptions = {
           color: labelColour,
@@ -297,7 +301,7 @@ class BarChart {
     bar.animate({
       progress: 1,  // fake property that transitions from 0 to 1; use it to calculate height, labels, etc.
     }, {
-      duration: 2000,
+      duration: this.animationLength,
       step: function() {  // normally the syntax here would be function(now, fx), but since those parameters are unused, ESLint would throw an error
         bar.css('height', Math.pow(this.progress, barSpeed) * targetHeight);
 
@@ -453,9 +457,12 @@ class BarChart {
   }
 
   // find contrasting colour against bar or chart background (depending on whether label is inside or outside bar)
-  autoLabelColour(bgColour) {
-    const LUM_DIFF = 0.75;
-    return this.contrastingShade(bgColour, LUM_DIFF);
+  //   - by default, find a high contrast to the average luminance of bar and bg
+  autoLabelColour(barColour, backgroundColour) {
+    const LUM_DIFF = 0.65;
+    
+    let mixBarBgColour = this.shiftLuminance(barColour, 0.75 * this.luminance(barColour) + 0.25 * this.luminance(backgroundColour));
+    return this.contrastingShade(mixBarBgColour, LUM_DIFF);
   }
 
   clamp(x, min, max) {
