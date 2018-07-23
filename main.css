@@ -2,7 +2,7 @@ html, body { height: 100%; }
 
 body {
   background-color: lemonchiffon;
-  font-size: 130%;
+  font-size: 100%;
   font-family: Georgia;
   padding: 0 2em;
   color: midnightblue;
@@ -15,6 +15,7 @@ h1 {
   font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
   width: 50%;
   line-height: 25px;
+  font-size: 250%;
   margin: auto;
 }
 

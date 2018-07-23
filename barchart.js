@@ -1,5 +1,5 @@
 $( document ).ready(function() {
-  drawBarChart([[1, 1, 2, 2, 3, 3], [2, 3, 1, 3, 1, 2], [3, 2, 3, 1, 2, 1], ['a', 'b', 'c', 'd', 'e', 'f']], {animateBars: false, caption: 'multiple data series'}, '#chart0');
+  drawBarChart([[1, 1, 2, 2, 3, 3], [2, 3, 1, 3, 1, 2], [3, 2, 3, 1, 2, 1], ['armadillo', 'barracuda', 'chinchilla', 'dolphin', 'echidna', 'falcon']], {animateBars: false, caption: 'multiple data series'}, '#chart0');
   drawBarChart([[1, 1, 2, 2, 3, 3], [2, 3, 1, 3, 1, 2], [3, 2, 3, 1, 2, 1]], {animateBars: false, caption: 'multiple data series'}, '#chart1');
 
   drawBarChart([[1, 2, 3]], {caption: 'you won\'t see this'}, '#chart2');  // this chart will get erased by the next one
@@ -30,6 +30,7 @@ const BAR_CHART_DEFAULTS = {
   displayXAxis: true,
   displayYAxis: true,
   displayHeightLabels: true,
+  displayDataLabels: true,
   labelColourFunction: 'auto',
   animateBars: true,
   animateHeightLabels: true,
@@ -87,6 +88,8 @@ class BarChart {
     this.displayXAxis = this.displayAxes && ((typeof options.displayXAxis == 'boolean') ? options.displayXAxis : BAR_CHART_DEFAULTS.displayXAxis);
     this.displayYAxis = this.displayAxes && ((typeof options.displayYAxis == 'boolean') ? options.displayYAxis : BAR_CHART_DEFAULTS.displayYAxis);
     this.displayHeightLabels = (typeof options.displayHeightLabels == 'boolean') ? options.displayHeightLabels : BAR_CHART_DEFAULTS.displayHeightLabels;
+    this.displayDataLabels = (typeof options.displayDataLabels == 'boolean') ? options.displayDataLabels : BAR_CHART_DEFAULTS.displayDataLabels;
+    if (this.numDataSeries == this.data.length) { this.displayDataLabels = false; }  // don't display data labels if there aren't any
     this.labelColourFunction = options.labelColourFunction || BAR_CHART_DEFAULTS.labelColourFunction;
     if (this.labelColourFunction == 'auto') { this.labelColourFunction = this.autoLabelColour; }
     
@@ -121,6 +124,7 @@ class BarChart {
 
     this.drawBars();
     this.drawAxes();
+    this.drawDataLabels();
     this.drawHeightLabels();
     this.animate();
   }
@@ -247,6 +251,30 @@ class BarChart {
       this.createRectangle(axisId, axisOptions);
     }
   }
+
+  drawDataLabels() {
+    if (this.displayDataLabels) {
+      let labels = this.data[this.data.length - 1];
+      for (let j in labels) {
+        let barColour = $( '#' + this.id + '-bar0-' + j ).css('backgroundColor');
+        let labelColour = this.labelColourFunction(barColour, this.backgroundColour);
+        let labelBackgroundColour = this.transparentColour(this.backgroundColour, 0.5);  // use semi-transparent background colour for label so that it shows up against bars
+
+        let labelId = this.id + '-dataLabel' + j;
+        let labelOptions = {
+          fontSize: 15,
+          backgroundColor: labelBackgroundColour,
+          color: labelColour,
+          position: 'absolute',
+          bottom: this.xAxisFromBottom - 8,
+          textAlign: 'center',
+        };
+        let rect = this.createRectangle(labelId, labelOptions, labels[j]);
+        rect.width(Math.max(rect.width(), this.barGroupWidth)); // if label is short, expand its width to take up whole group
+        rect.css('left', this.barLeftPos(0, j) + (this.barGroupWidth - parseFloat(rect.css('width'))) * 0.5);  // wait until here to assign left, since it depends on width (which depends on text)
+      }
+    }
+  }
   
   drawHeightLabels() {
     if (this.displayHeightLabels) {
@@ -258,6 +286,7 @@ class BarChart {
 
           let labelId = this.id + '-heightLabel' + i + '-' + j;
           let labelOptions = {
+            fontSize: 20,
             color: labelColour,
             position: 'absolute',
             bottom: (dataGroup[j] < 0) ? this.xAxisFromBottom - this.heightInPixels(dataGroup[j]) : undefined,
@@ -265,7 +294,7 @@ class BarChart {
             textAlign: 'center',
           };
           let rect = this.createRectangle(labelId, labelOptions, dataGroup[j]);
-          rect.css('left', this.barLeftPos(i, j) + (this.barWidth - parseFloat(rect.css('width'))) * 0.5);
+          rect.css('left', this.barLeftPos(i, j) + (this.barWidth - parseFloat(rect.css('width'))) * 0.5);  // wait until here to assign left, since it depends on width (which depends on text)
         }
       }
     }
@@ -526,6 +555,12 @@ class BarChart {
 
   RGBArrayToString(rgb) {
     return 'rgb(' + rgb.map( x => Math.round(x) ).join(',') + ')';
+  }
+
+  // convert RGB to RGBA
+  transparentColour(str, alpha) {
+    let rgb = this.RGBStringToArray(str);
+    return 'rgba(' + rgb.map( x => Math.round(x) ).join(',') + ',' + alpha + ')';
   }
 
   // see e.g. Wikipedia article on HSV
