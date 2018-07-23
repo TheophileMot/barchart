@@ -1,7 +1,9 @@
 $( document ).ready(function() {
-  drawBarChart([[1, 2], [2, 1]], {caption: 'multiple data series'}, '#chart0');
+  drawBarChart([[1, 1, 2, 2, 3, 3], [2, 3, 1, 3, 1, 2], [3, 2, 3, 1, 2, 1]], {caption: 'multiple data series', defaultBarColour: 'rgb(196, 168, 10)'}, '#chart0');
+  drawBarChart([[1, 1, 2, 2, 3, 3], [2, 3, 1, 3, 1, 2], [3, 2, 3, 1, 2, 1]], {caption: 'multiple data series'}, '#chart0');
+  drawBarChart([[1, 1, 2, 2, 3, 3], [2, 3, 1, 3, 1, 2], [3, 2, 3, 1, 2, 1], [5, 5, 5, 5, 5, 5]], {caption: 'multiple data series'}, '#chart0');
   drawBarChart([[1, 2, 3]], {caption: 'you won\'t see this'}, '#chart1');  // this chart will get erased by the next one
-  drawBarChart([[-8, -13, -5, -2, -19, -3, -1, -4]], {displayHeightLabels: false, displayAxes: false, padding: 5, barGroupGapRatio: 0.000001, caption: '<p>previous chart here was automatically erased (see source)</p><p>and now there are some very slow thin lines: bar-to-gap ratio is <em>almost</em> 0</p>', captionSize: 12, title: 'perhaps it is raining', titleSize: 15, titlePadding: 5, animationLength: 20000, randomSpeed: true}, '#chart1');
+  drawBarChart([[-8, -13, -5, -2, -19, -3, -1, -4]], {displayHeightLabels: false, displayAxes: false, padding: 5, barGroupGapRatio: 0.000001, caption: '<p>previous chart here was automatically erased (see source)</p><p>and now there are some very slow thin lines: bar-to-gap ratio is <em>almost</em> 0</p>', captionSize: 12, titleSize: 15, titlePadding: 5, animationLength: 20000, randomSpeed: true}, '#chart1');
   drawBarChart([[1, 7, 0, 1, 2, 5, -10, 8, 18, 2]], {barGroupGapRatio: 0.9, backgroundColourInherit: true, displayHeightLabels: false, caption: 'background colour inherited from page CSS (as opposed to bar chart defaults)', animationLength: 500}, '#chart2');
   drawBarChart([[13, -8, 5, -3, 2, -1, 1, 0, 1, 1, 2, 3, 5, 8, 13]], {backgroundColour: 'rgb(162, 152, 112)', displayAxes: false, barGroupGapRatio: 0.8, animateHeightLabels: false, caption: 'these number labels don\'t change during the animation', captionPadding: 0, titleSize: 15, titlePadding: 0, titleColour: 'rgb(0,50,0)'}, '#chart3');
   drawBarChart([[1, 2, 3, 2, 3, 1, 3, 2, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 2, 3, 1, 3, 2, 3, 2, 1, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2]], {backgroundColour: 'rgb(60, 180, 140)', barGroupGapRatio: 0, padding: 0, animateBars: false, displayHeightLabels: false}, '#chart4');  
@@ -11,15 +13,15 @@ $( document ).ready(function() {
   drawBarChart([Array(10).fill(100)], {title: 'and they\'re off!', caption: 'Note how the labels and heights of each bar grow at the same random rate. A cute effect.', backgroundColour: 'rgb(162, 146, 122)', displayAxes: false, randomSpeed: true}, '#chart8');
   drawBarChart([Array(10).fill(100)], {title: 'and they\'re off?', caption: 'Note how the labels and heights of each bar grow at different random rates. A precious effect, not to be overused.', backgroundColour: 'rgb(164, 132, 110)', displayAxes: false, randomBarSpeed: true, randomHeightLabelSpeed: true}, '#chart9');
   drawBarChart([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]], {title: 'the perils of user customization', titleColour: 'rgb(250, 0, 0)', titleBackgroundColour: 'rgb(0, 150, 0)', titleSize: 25, caption: 'when in doubt, trust the default settings', captionColour: 'rgb(200,230,240)', captionBackgroundColour: 'rgb(240,230,220)', captionSize: 6, defaultBarColour: 'rgb(0,0,30)', labelColourFunction:()=>'rgb('+Math.random()*255+','+Math.random()*255+','+Math.random()*255+')', backgroundColour: 'rgb(24, 12, 30)', randomBarSpeed: true, randomHeightLabelSpeed: true}, '#chart10');
-  drawBarChart([[7, 3, 2.8765, 1, -0.01]], {backgroundColour: 'rgb(255, 255, 0)', title: 'extreme (pure) colours are hard to work with...', caption: '...but the default settings still do a decent job'}, '#chart11');
+  drawBarChart([[7, 3, 2.85, 1, -0.01], [3, 0, 0, 0, 0], [1, 2, 3, 4, 5]], {backgroundColour: 'rgb(255, 255, 0)', title: 'extreme colours like pure yellow are often hard to work with...', caption: '...but the default settings still do a decent job'}, '#chart11');
 });
 
 const BAR_CHART_DEFAULTS = {
-  barGroupGapRatio: 0.6,                   // bar groups slightly wider than gaps
+  barGroupGapRatio: 0.7,                   // bar groups slightly wider than gaps
   barGapRatio: 1,                          // bars take up full width in their groups
   padding: 10,
   backgroundColourInherit: false,
-  backgroundColour: 'rgb(32, 66, 120)',
+  backgroundColour: 'rgb(22, 46, 100)',
   defaultBarColour: 'auto',
   displayAxes: true,                  // overrides next two options
   displayXAxis: true,
@@ -72,6 +74,7 @@ class BarChart {
     this.backgroundColour = $( element ).css('background-color');
     this.defaultBarColour = options.defaultBarColour || BAR_CHART_DEFAULTS.defaultBarColour;
     if (this.defaultBarColour == 'auto') { this.defaultBarColour = this.calcAutoBarColour(); }
+    if (!Array.isArray(this.defaultBarColour)) { this.defaultBarColour = Array(this.data.length).fill(this.defaultBarColour); }
     this.displayAxes = (typeof options.displayAxes == 'boolean') ? options.displayAxes : BAR_CHART_DEFAULTS.displayAxes;
     this.displayXAxis = this.displayAxes && ((typeof options.displayXAxis == 'boolean') ? options.displayXAxis : BAR_CHART_DEFAULTS.displayXAxis);
     this.displayYAxis = this.displayAxes && ((typeof options.displayYAxis == 'boolean') ? options.displayYAxis : BAR_CHART_DEFAULTS.displayYAxis);
@@ -89,7 +92,7 @@ class BarChart {
     this.title = options.title || BAR_CHART_DEFAULTS.title;
     this.titleSize = options.titleSize || BAR_CHART_DEFAULTS.titleSize;
     this.titleColour = options.titleColour || BAR_CHART_DEFAULTS.titleColour;
-    if (this.titleColour == 'auto') { this.titleColour = this.calcAutoBarColour(); }  // choose same colour as bars by default
+    if (this.titleColour == 'auto') { this.titleColour = this.calcAutoBarColour()[0]; }  // choose same colour as bars (from first data series) by default
     this.titleBackgroundColour = options.titleBackgroundColour || BAR_CHART_DEFAULTS.titleBackgroundColour;
     if (this.titleBackgroundColour == 'auto') { this.titleBackgroundColour = this.calcAutoBackgroundColour(this.titleColour);}
     this.titlePadding = this.title ? ((options.titlePadding >= 0) ? options.titlePadding : BAR_CHART_DEFAULTS.titlePadding) : 0;
@@ -191,7 +194,7 @@ class BarChart {
       for (let j in dataGroup) {
         let barId = this.id + '-bar' + i + '-' + j;
         let barOptions = {
-          backgroundColor: this.defaultBarColour,
+          backgroundColor: this.defaultBarColour[i],
           position: 'absolute',
           left: this.barLeftPos(i, j),
           width: this.barWidth,
@@ -449,17 +452,25 @@ class BarChart {
     return this.chartHeight / heightDiff;
   }
 
-  //  find a nice colour based on background: shift hue (say by 30˚), choose contrasting luminance (say with a lum. difference of 0.5)
+  //  find a nice colour based on background: shift hue (say by 30˚, then an additional 15˚ per data series), choose contrasting luminance (say with a lum. difference of 0.4)
   calcAutoBarColour() {
-    const HUE_DIFF = 30;
+    const BASE_HUE_DIFF = 30;
+    const HUE_DIFF = 15;
     const LUM_DIFF = 0.4;
 
     let bg = this.RGBStringToArray(this.backgroundColour);
-    let shiftedBg = this.shiftHue(bg, HUE_DIFF);
 
-    let lum = this.luminance(bg);
-    let targetLum = lum + LUM_DIFF * ((lum < 0.5) ? 1 : -1);
-    return this.RGBArrayToString(this.shiftLuminance(shiftedBg, targetLum));
+    let barColours = [];
+    for (let i in this.data[0]) {
+      let shiftedBg = this.shiftHue(bg, BASE_HUE_DIFF + i * HUE_DIFF);
+
+      let lum = this.luminance(bg);
+      let lumFactor = 1 - (i % 2) / 2;   // alternate between 1 and 0.5 times LUM_DIFF so that successive bars contrast each other
+      let targetLum = lum + lumFactor * LUM_DIFF * ((lum < 0.5) ? 1 : -1);
+
+      barColours.push(this.RGBArrayToString(this.shiftLuminance(shiftedBg, targetLum)));
+    }
+    return barColours;
   }
 
   calcAutoBackgroundColour(col) {
