@@ -1,22 +1,23 @@
 $( document ).ready(function() {
-  drawBarChart([[1, 1, [2, 'rgb(20, 60, 90'], 2, 3, 3], [2, 3, [1, 'rgb(60, 90, 20)'], 3, 1, 2], [3, 2, [3, 'rgb(90, 20, 60)'], 1, 2, 1]], {animateBars: false, defaultBarColour: 'rgb(250, 150, 175)', displayAxes: false, displayHeightLabels: false, caption: 'multiple data series; just one colour, except where overridden'}, '#chart0');
-  drawBarChart([[1, 1, 2, 2, 3, 3], [2, 3, 1, 3, 1, 2], [3, 2, 3, 1, 2, 1], ['armadillo', 'barracuda', 'chinchilla', 'dolphin', 'echidna', 'falcon']], {animateBars: false, caption: 'labels for data series<br>(note how each label\'s bounding box coincides with the bar group)', barGroupGapRatio: 0.85, backgroundColour: 'rgb(20,30,130)'}, '#chart1');
+  drawBarChart([[1, 1, 2, 2, 3, 3], [2, 3, 1, 3, 1, 2], [3, 2, 3, 1, 2, 1], ['armadillo', 'barracuda', 'chinchilla', 'dolphin', 'echidna', 'falcon']], {animateBars: false, title: 'labels for data series', caption: 'note how each label\'s bounding box coincides with the bar group', barGroupGapRatio: 0.85, backgroundColour: 'rgb(50,35,130)'}, '#chart0');
+  drawBarChart([[19, 17, [4, 'rgb(20, 60, 190']], [20, 13.4, [7, 'rgb(60, 190, 20)']], [33, 15, [5, 'rgb(190, 220, 190)']], [15, 16, 17], ['great', 'good', 'pretty bad']], {animateBars: false, defaultBarColour: 'rgb(250, 150, 175)', displayHeightLabels: false, caption: 'multiple data series; just one colour, except where overridden', displayTicks: true}, '#chart1');
 
   drawBarChart([[1, 2, 3]], {caption: 'you won\'t see this'}, '#chart2');  // this chart will get erased by the next one
-  drawBarChart([[-8, -13, -5, -2, -19, -3, -1, -4]], {displayHeightLabels: false, displayAxes: false, padding: 5, barGroupGapRatio: 0.000001, caption: '<p>previous chart here was automatically erased (see source)</p><p>and now there are some very slow thin lines: bar-to-gap ratio is <em>almost</em> 0</p>', captionSize: 12, titleSize: 15, titlePadding: 5, animationLength: 20000, randomSpeed: true}, '#chart2');
-  drawBarChart([[1, 7, 0, 1, 2, 5, -10, 8, [18, 'rgb(200, 250, 10)'], 2]], {title: 'quick animation', titleSize: 15, titlePadding: 5, barGroupGapRatio: 0.9, backgroundColourInherit: true, displayHeightLabels: false, caption: 'background colour inherited from page CSS (as opposed to bar chart defaults);<br>one of the data points has a custom colour', animationLength: 500}, '#chart3');
+  drawBarChart([[-8, -13, -5, -2, -19, -3, -1, -4]], {displayHeightLabels: false, displayAxes: false, padding: 5, barGroupGapRatio: 0.000001, caption: '<p>previous chart here was automatically erased (see source)</p><p>and now there are some very slow thin lines: bar-to-gap ratio is <em>almost</em> 0</p>', captionSize: 15, captionPadding: 1, animationLength: 20000, randomSpeed: true}, '#chart2');
+  drawBarChart([[1, 7, 0, 1, 2, 5, -10, 8, [18, 'rgb(200, 250, 10)'], 2]], {title: 'quick animation', titleSize: 15, titlePadding: 5, barGroupGapRatio: 0.9, backgroundColourInherit: true, displayHeightLabels: false, caption: 'background colour inherited from page CSS (as opposed to bar chart defaults);<br>one of the bars has a custom colour', animationLength: 500}, '#chart3');
   drawBarChart([[13, -8, 5, -3, 2, -1, 1, 0, 1, 1, 2, 3, 5, 8, 13]], {backgroundColour: 'rgb(162, 152, 112)', displayAxes: false, barGroupGapRatio: 0.8, animateHeightLabels: false, caption: 'these number labels don\'t change during the animation', captionPadding: 0, titleSize: 15, titlePadding: 0, titleColour: 'rgb(0,50,0)'}, '#chart4');
   
-  drawBarChart([[1, 2, 3, 2, 3, 1, 3, 2, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 2, 3, 1, 3, 2, 3, 2, 1, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2]], {backgroundColour: 'rgb(60, 180, 140)', barGapRatio: 1, barGroupGapRatio: 1, padding: 0, animateBars: false, displayHeightLabels: false}, '#chart5');  
-  drawBarChart([[0, 1, 8, 27, 64]], {title: 'whole numbers', caption: 'even though some inputs have 2 sig. figs, all inputs are integers: thus, animated numbers are restricted to integers as well (so we won\'t see 0.9, say, during animation, even though it has only 1 sig. fig.)', captionSize: 12, captionPadding: 2, displayTicks: true, backgroundColour: 'rgb(175, 35, 65)', displayYAxis: false}, '#chart6');
-  drawBarChart([[10000, 30000]], {title: 'clean numbers', caption: 'input has 1 sig. fig., so animated labels have only up to 2', backgroundColour: 'rgb(120, 100, 165)', barGroupGapRatio: 0.8, displayTicks: true}, '#chart7');
-  drawBarChart([[10000, 30000.1]], {title: 'messy numbers', caption: 'input has 6 sig. figs, so animated labels have up to 7; also note tick spacing', backgroundColour: 'rgb(120, 100, 165)', barGroupGapRatio: 0.8, displayTicks: true}, '#chart8');
+  drawBarChart([[0, 1, 8, 27, 64]], {title: 'whole numbers', caption: 'even though some inputs have 2 sig. figs, all inputs are integers: thus, animated numbers are restricted to integers as well (so we won\'t see 0.9, say, during animation, even though it has only 1 sig. fig.)', captionSize: 12, captionPadding: 2, displayTicks: true, backgroundColour: 'rgb(175, 35, 65)', displayYAxis: false}, '#chart5');
+  drawBarChart([[10000, 30000]], {title: 'clean numbers', caption: 'input has 1 sig. fig., so animated labels have only up to 2', backgroundColour: 'rgb(120, 100, 165)', barGroupGapRatio: 0.8, displayTicks: true}, '#chart6');
+  drawBarChart([[10000, 30000.1]], {title: 'messy numbers', caption: 'input has 6 sig. figs, so animated labels have up to 7', backgroundColour: 'rgb(120, 100, 165)', barGroupGapRatio: 0.8, displayTicks: true}, '#chart7');
+  drawBarChart([[10000, 30000]], {title: 'custom ticks', caption: '', tickInterval: 1618, backgroundColour: 'rgb(120, 100, 165)', barGroupGapRatio: 0.8, displayTicks: true}, '#chart8');
   
   drawBarChart([Array(10).fill(100)], {title: 'and they\'re off!', caption: 'Note how the labels and heights of each bar grow at the same random rate. A cute effect.', backgroundColour: 'rgb(162, 146, 122)', displayAxes: false, randomSpeed: true}, '#chart9');
   drawBarChart([Array(10).fill(100)], {title: 'and they\'re off?', caption: 'Note how the labels and heights of each bar grow at different random rates. A precious effect, not to be overused.', backgroundColour: 'rgb(164, 132, 110)', displayAxes: false, randomBarSpeed: true, randomHeightLabelSpeed: true}, '#chart10');
   
-  drawBarChart([[1, 2, 3, 4, 5, 6, 7, [8, 'cornflowerblue'], 9, 10]], {title: 'the perils of user customization', titleColour: 'rgb(250, 0, 0)', titleBackgroundColour: 'rgb(0, 150, 0)', titleSize: 25, caption: 'when in doubt, trust the default settings', captionColour: 'rgb(200,230,240)', captionBackgroundColour: 'rgb(240,230,220)', captionSize: 6, defaultBarColour: 'rgb(0,0,30)', labelColourFunction:()=>'rgb('+Math.random()*255+','+Math.random()*255+','+Math.random()*255+')', backgroundColour: 'rgb(24, 12, 30)', randomBarSpeed: true, randomHeightLabelSpeed: true}, '#chart11');
-  drawBarChart([[7, 3, 2, 1, -1], [3, 1, 5, -2, 1], [1, 2, 3, 4, 5]], {backgroundColour: 'rgb(255, 255, 0)', title: 'extreme colours like pure yellow are often hard to work with...', caption: '...but the default settings still do a decent job', displayTicks: true}, '#chart12');
+  drawBarChart([[1, 2, 3, 2, 3, 1, 3, 2, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2, 3, 1, 2, 1, 2, 3, 2, 1, 2, 3, 1, 3, 2, 3, 2, 1, 3, 1, 2, 1, 2, 3, 2, 1, 3, 1, 2, 1, 3, 1, 3, 2], ['here are some notes', 'and additional information', 'but it won\'t be displayed']], {backgroundColour: 'rgb(60, 180, 140)', barGapRatio: 1, barGroupGapRatio: 1, padding: 0, animateBars: false, displayHeightLabels: false, displayDataLabels: false, caption: 'data labels are hidden (see source)'}, '#chart11');
+  drawBarChart([[1, 2, 3, 4, 5, 6, 7, [8, 'cornflowerblue'], 9, 10]], {title: 'the perils of user customization', titleColour: 'rgb(250, 0, 0)', titleBackgroundColour: 'rgb(0, 150, 0)', titleSize: 25, caption: 'when in doubt, trust the default settings', captionColour: 'rgb(200,230,240)', captionBackgroundColour: 'rgb(240,230,220)', captionSize: 6, defaultBarColour: 'rgb(0,0,30)', labelColourFunction:()=>'rgb('+Math.random()*255+','+Math.random()*255+','+Math.random()*255+')', backgroundColour: 'rgb(24, 12, 30)', randomBarSpeed: true, randomHeightLabelSpeed: true}, '#chart12');
+  drawBarChart([[7, 3, 2, 1, -1], [3, 1, 5, -2, 1], [1, 2, 3, 4, 5]], {backgroundColour: 'rgb(255, 255, 0)', title: 'extreme colours like pure yellow are often hard to work with...', caption: '...but the default settings still do a decent job', displayTicks: true}, '#chart13');
 });
 
 const BAR_CHART_DEFAULTS = {
@@ -30,6 +31,7 @@ const BAR_CHART_DEFAULTS = {
   displayXAxis: true,
   displayYAxis: true,
   displayTicks: false,
+  tickInterval: 'auto',
   displayHeightLabels: true,
   displayDataLabels: true,
   labelColourFunction: 'auto',
@@ -112,6 +114,8 @@ class BarChart {
     this.displayXAxis = this.displayAxes && ((typeof options.displayXAxis == 'boolean') ? options.displayXAxis : BAR_CHART_DEFAULTS.displayXAxis);
     this.displayYAxis = this.displayAxes && ((typeof options.displayYAxis == 'boolean') ? options.displayYAxis : BAR_CHART_DEFAULTS.displayYAxis);
     this.displayTicks = (typeof options.displayTicks == 'boolean') ? options.displayTicks : BAR_CHART_DEFAULTS.displayTicks;
+    this.tickInterval = options.tickInterval || BAR_CHART_DEFAULTS.tickInterval;  // if 'auto', deal with it later (it will be calculated based on available room)
+
     this.displayHeightLabels = (typeof options.displayHeightLabels == 'boolean') ? options.displayHeightLabels : BAR_CHART_DEFAULTS.displayHeightLabels;
     this.displayDataLabels = (typeof options.displayDataLabels == 'boolean') ? options.displayDataLabels : BAR_CHART_DEFAULTS.displayDataLabels;
     if (this.dataLabels == undefined) { this.displayDataLabels = false; }  // don't display data labels if there aren't any
@@ -221,7 +225,7 @@ class BarChart {
     this.barSpacing = this.calcBarSpacing();
     this.maxYBars = this.calcMaxYBars();
     this.minYBars = this.calcMinYBars();
-    this.tickDist = this.calcTickDist();
+    this.tickInterval = this.calcTickInterval();
     this.maxTickIndex = this.calcMaxTickIndex();
     this.minTickIndex = this.calcMinTickIndex();
     this.maxYBarsTicks = this.calcMaxYBarsTicks();
@@ -293,7 +297,7 @@ class BarChart {
           position: 'absolute',
           left: this.padding,
           width: this.chartWidth,
-          bottom: this.yTransform(i * this.tickDist),
+          bottom: this.yTransform(i * this.tickInterval),
           height: 1,
           backgroundColor: tickColour,
         };
@@ -531,8 +535,12 @@ class BarChart {
   //   - ticks should be neither too close nor too far apart, and should not be strange numbers
   //   - thus return a number of the form 10^n * a, where a is 1, 2, 2.5, or 5
   //   - find the smallest such number such that the resulting ticks are displayed at least a certain number of pixels apart
-  calcTickDist() {
+  calcTickInterval() {
     const MIN_TICK_DIST = 30; // minimum tick distance in pixels
+
+    if (this.tickInterval != 'auto') {  // it's already set by user; just return
+      return this.tickInterval;
+    }
 
     let verticalScale = this.calcVerticalScale(true);
 
@@ -560,12 +568,12 @@ class BarChart {
 
   // put highest tick at or above max bar height
   calcMaxTickIndex() {
-    return Math.ceil(this.maxYBars / this.tickDist);
+    return Math.ceil(this.maxYBars / this.tickInterval);
   }
 
   // put lowest tick at or below min bar height
   calcMinTickIndex() {
-    return Math.floor(this.minYBars / this.tickDist);
+    return Math.floor(this.minYBars / this.tickInterval);
   }
   
   // calculate horizontal spacing ("units") between bar groups:
@@ -597,13 +605,13 @@ class BarChart {
   }
   
   calcMaxYBarsTicks() {
-    let maxYTicks = this.displayTicks ? this.maxTickIndex * this.tickDist : 0;
+    let maxYTicks = this.displayTicks ? this.maxTickIndex * this.tickInterval : 0;
     return Math.max(this.maxYBars, maxYTicks);
   }
 
   // calculate minimum y value (top or bottom) of all bars/ticks: this could be 0 if all data is positive
   calcMinYBarsTicks() {
-    let minYTicks = this.displayTicks ? this.minTickIndex * this.tickDist : 0;
+    let minYTicks = this.displayTicks ? this.minTickIndex * this.tickInterval : 0;
     return Math.min(this.minYBars, minYTicks);
   }
 
