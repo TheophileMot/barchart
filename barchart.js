@@ -7,8 +7,8 @@ function drawBarChart(data, options, element) {
   //   if any series starts with a string, it is assumed to be an array of labels for the data groups
   //
   // options: an object with any of the following:
-  //   barGroupGapRatio: 0.7,              // ratio of (width of bar group) to (gap separating groups)
-  //   barGapRatio: 1,                     // within a group, ratio of (width of bar) to (gap separating bars). At 1, there is no space between bars.
+  //   barGroupGapRatio: 0.7,              // ratio of (width of bar group) to (width of bar + gap separating groups)
+  //   barGapRatio: 1,                     // within a group, ratio of (width of bar) to (width of bar + gap separating bars). At 1, there is no space between bars.
   //   padding: 10,
   //   backgroundColourInherit: false,
   //   backgroundColour: 'rgb(60, 120, 180)',
