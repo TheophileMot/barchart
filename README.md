@@ -6,15 +6,17 @@ This is a bar chart API written in JavaScript and a bit of jQuery. By default, b
 
 The user can specify a title (at the top) and a caption (at the bottom), along with font size and padding.
 
-One simple animation is included: the bar height grows from 0 to 100%. If the bar height labels are being displayed, the amount showing will grow correspondingly during the animation. In this case, the numbers are rounded off to a level of precision appropriate to the data (e.g., if a given data bar is a multiple of 1,000, then the label will grow in multiploes of 100 during the animation). This effect can be turned off, so that the height label shows the true value from the beginning. The animation can also be set such that the bars grow at different rates; similarly, the height labels can grow at different rates independently from the bars.
+One simple animation is included: the bar height grows from 0 to 100%. If the bar height labels are being displayed, the amount showing will grow correspondingly during the animation. In this case, the numbers are rounded off to a level of precision appropriate to the data (e.g., if a given data bar is a multiple of 1,000, then the label will grow in multiples of 100 during the animation). This effect can be turned off, so that the height label shows the true value throughout the animation. The animation can also be set such that the bars grow at different rates; similarly, the height labels can grow at different rates independently from the bars.
 
-If grid lines (called 'tick marks' in the code) are used, the program automatically calculates a reasonable scale: they are neither too close nor too far apart, and the common interval will be a multiple of a simple number: 10^n * (1, 2, 2.5, or 5).
+If horizontal grid lines (called 'tick marks' in the code) are used, the program automatically calculates a reasonable scale: they are neither too close nor too far apart, and the common interval will be a multiple of a simple number: 10^n * (1, 2, 2.5, or 5).
 
-The bars are presented as groups along the x-axis, the number of bars in each group being the number of data series. There are two scales at which the data are spaced: a group ratio at the global level, and a bar ratio within the groups. When the group ratio is 0.5, each group is exactly as wide as the gap separating it from the next group; when the ratio is 1, there is no gap; the bar ratio is similar. By default, the group ratio is 0.7 (so that there is some space between groups, but not too much), while the bar ratio is 1 (so that bars are fully adjacent within groups).
+The bars are presented as groups along the x-axis, the number of bars in each group being the number of data series. There are two scales at which the data are spaced: a group ratio at the global level, and a bar ratio within the groups. The first is the ratio of group width to (group + gap) width, so that when this ratio is 0.5, for example, each group is exactly as wide as the gap separating it from the next group. The bar ratio is similar, at a smaller scale. By default, the group ratio is 0.7 (so that there is some space between groups, but not too much), while the bar ratio is 1 (so that bars are fully adjacent within groups).
 
 # API
 
-A chart is created within a DOM element by calling `drawBarChart(data, options, element)`. Many of the options are self-explanatory.
+A chart is created within a DOM element by calling `drawBarChart(data, options, element)`. A list of options is below; many are self-explanatory or are demonstrated in the example charts.
+
+Apart from this function and an object listing the default settings, BAR_CHART_DEFAULTS, everything is contained in a BarChart class. The constructor destroys any previous bar chart elements in the given DOM element, parses the user input, and sets up the different options; the chart may then be drawn.
 
      data:
        [ [series 1], [series 2], ..., [series n], ([labels]) ]
@@ -83,16 +85,10 @@ It should be easy to specific the **font size of the height and data labels**.
 
 It would be good to allow a **custom function for bar colour**, just as there is one for label colour. (Arguably, the former is far more useful, e.g., colouring based on height).
 
-etc., etc.
+There is also little to no **error checking** or data validation: if the user doesn't behave, the program won't produce an informative error message.
 
 # External resources
 
 I consulted Wikipedia for some colour details (e.g., on luminance), and the jQuery API (https://api.jquery.com/) to learn the basics of jQuery.
 
 #    Example Screenshots (embedded within the readme as image tags)
-#    List the API functions that you would expect a user to use
-#    Describe the function and the parameters to each function
-#    A Feature list of your library (options it supports, etc)
-#    A list of known issues / bugs
-#    A list of features that are on the roadmap but haven't been implemented yet
-#    A list of all the external resources (tutorials, docs, example code, etc) that you encountered and used to help you create this #library
