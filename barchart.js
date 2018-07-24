@@ -330,22 +330,13 @@ class BarChart {
             position: 'absolute',
             textAlign: 'center',
           };
-          let rect = this.createRectangle(labelId, labelOptions, dataGroup[j]);
-          rect.css('left', this.barLeftPos(i, j) + (this.barWidth - parseFloat(rect.css('width'))) * 0.5);  // wait until here to assign left, since it depends on width (which depends on text)
+          let label = this.createRectangle(labelId, labelOptions, this.data[i][j]);
+          label.css('left', this.barLeftPos(i, j) + (this.barWidth - parseFloat(label.css('width'))) * 0.5);  // wait until here to assign left, since it depends on width (which depends on text)
 
-          if (dataGroup[j] < 0) {
-            if (parseFloat(rect.css('height')) <= this.heightInPixels(dataGroup[j])) {
-              rect.css('bottom', this.xAxisFromBottom - this.heightInPixels(dataGroup[j]));
-            } else {
-              rect.css('bottom', this.xAxisFromBottom);
-            }
-            
+          if (this.data[i][j] >= 0) {
+            label.css('top', this.xAxisFromTop - this.heightLabelDistFromAxis(label, this.data[i][j]));
           } else {
-            if (parseFloat(rect.css('height')) <= this.heightInPixels(dataGroup[j])) {
-              rect.css('top', this.xAxisFromTop - this.heightInPixels(dataGroup[j]));
-            } else {
-              rect.css('top', this.xAxisFromTop);
-            }
+            label.css('bottom', this.xAxisFromBottom - this.heightLabelDistFromAxis(label, this.data[i][j]));
           }
         }
       }
@@ -374,7 +365,7 @@ class BarChart {
     let label = $( '#' + this.id + '-heightLabel' + i + '-' + j );
 
     let targetHeight = this.heightInPixels(this.data[i][j]);
-    let targetLabelHeight = targetHeight + ((parseFloat(label.css('height')) <= this.heightInPixels(this.data[i][j])) ? 0 : parseFloat(label.css('height')));
+    let targetLabelHeight = this.heightLabelDistFromAxis(label, this.data[i][j]);
 
     let barSpeed = 1;
     let heightLabelSpeed = 1;
@@ -441,6 +432,14 @@ class BarChart {
   heightInPixels(h) {
     let minHeight = this.displayXAxis ? 2 : 1;
     return Math.ceil(Math.max(minHeight, Math.abs(h) * this.verticalScale));
+  }
+
+  // calculate vertical distance of height label from axis
+  //  - bump label outside of bar if it won't fit inside
+  heightLabelDistFromAxis(label, data) {
+    let dataHeight = this.heightInPixels(data);
+    let bump = (parseFloat(label.css('height')) <= dataHeight) ? 0 : parseFloat(label.css('height'));
+    return dataHeight + bump;
   }
 
   // add DIV element to DOM: used for bars and axes
