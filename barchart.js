@@ -16,7 +16,7 @@ $( document ).ready(function() {
   drawBarChart([Array(10).fill(100)], {title: 'and they\'re off?', caption: 'Note how the labels and heights of each bar grow at different random rates. A precious effect, not to be overused.', backgroundColour: 'rgb(164, 132, 110)', displayAxes: false, randomBarSpeed: true, randomHeightLabelSpeed: true}, '#chart10');
   
   drawBarChart([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]], {title: 'the perils of user customization', titleColour: 'rgb(250, 0, 0)', titleBackgroundColour: 'rgb(0, 150, 0)', titleSize: 25, caption: 'when in doubt, trust the default settings', captionColour: 'rgb(200,230,240)', captionBackgroundColour: 'rgb(240,230,220)', captionSize: 6, defaultBarColour: 'rgb(0,0,30)', labelColourFunction:()=>'rgb('+Math.random()*255+','+Math.random()*255+','+Math.random()*255+')', backgroundColour: 'rgb(24, 12, 30)', randomBarSpeed: true, randomHeightLabelSpeed: true}, '#chart11');
-  drawBarChart([[7, 3, 2, 1, -1], [3, 1, 5, -2, 1], [1, 2, 3, 4, 5]], {backgroundColour: 'rgb(255, 255, 0)', title: 'extreme colours like pure yellow are often hard to work with...', caption: '...but the default settings still do a decent job'}, '#chart12');
+  drawBarChart([[7, 3, 2, 1, -1], [3, 1, 5, -2, 1], [1, 2, 3, 4, 5]], {backgroundColour: 'rgb(255, 255, 0)', title: 'extreme colours like pure yellow are often hard to work with...', caption: '...but the default settings still do a decent job', displayTicks: true}, '#chart12');
 });
 
 /*$( document ).ready(function() {
@@ -328,12 +328,25 @@ class BarChart {
             fontSize: 20,
             color: labelColour,
             position: 'absolute',
-            bottom: (dataGroup[j] < 0) ? this.xAxisFromBottom - this.heightInPixels(dataGroup[j]) : undefined,
-            top: (dataGroup[j] >= 0) ? this.xAxisFromTop - this.heightInPixels(dataGroup[j]) : undefined,
             textAlign: 'center',
           };
           let rect = this.createRectangle(labelId, labelOptions, dataGroup[j]);
           rect.css('left', this.barLeftPos(i, j) + (this.barWidth - parseFloat(rect.css('width'))) * 0.5);  // wait until here to assign left, since it depends on width (which depends on text)
+
+          if (dataGroup[j] < 0) {
+            if (parseFloat(rect.css('height')) <= this.heightInPixels(dataGroup[j])) {
+              rect.css('bottom', this.xAxisFromBottom - this.heightInPixels(dataGroup[j]));
+            } else {
+              rect.css('bottom', this.xAxisFromBottom);
+            }
+            
+          } else {
+            if (parseFloat(rect.css('height')) <= this.heightInPixels(dataGroup[j])) {
+              rect.css('top', this.xAxisFromTop - this.heightInPixels(dataGroup[j]));
+            } else {
+              rect.css('top', this.xAxisFromTop);
+            }
+          }
         }
       }
     }
@@ -361,6 +374,7 @@ class BarChart {
     let label = $( '#' + this.id + '-heightLabel' + i + '-' + j );
 
     let targetHeight = this.heightInPixels(this.data[i][j]);
+    let targetLabelHeight = targetHeight + ((parseFloat(label.css('height')) <= this.heightInPixels(this.data[i][j])) ? 0 : parseFloat(label.css('height')));
 
     let barSpeed = 1;
     let heightLabelSpeed = 1;
@@ -388,9 +402,9 @@ class BarChart {
 
         if (thisChart.displayHeightLabels) {
           if (thisChart.data[i][j] >= 0) {
-            label.css('top', thisChart.xAxisFromTop - Math.pow(this.progress, heightLabelSpeed) * targetHeight);
+            label.css('top', thisChart.xAxisFromTop - Math.pow(this.progress, heightLabelSpeed) * targetLabelHeight);
           } else {
-            label.css('bottom', thisChart.xAxisFromBottom - Math.pow(this.progress, heightLabelSpeed) * targetHeight);
+            label.css('bottom', thisChart.xAxisFromBottom - Math.pow(this.progress, heightLabelSpeed) * targetLabelHeight);
           }
           // if animating numbers on labels, try to keep roughly same level of information: allow one more significant figure than max in all data, but don't use more decimal places than current bar
           if (thisChart.animateHeightLabels) {
@@ -402,9 +416,9 @@ class BarChart {
         bar.css('height', targetHeight);
         if (thisChart.displayHeightLabels) {
           if (thisChart.data[i][j] >= 0) {
-            label.css('top', thisChart.xAxisFromTop - targetHeight);
+            label.css('top', thisChart.xAxisFromTop - targetLabelHeight);
           } else {
-            label.css('bottom', thisChart.xAxisFromBottom - targetHeight);
+            label.css('bottom', thisChart.xAxisFromBottom - targetLabelHeight);
           }
           // if animating numbers on labels, try to keep roughly same level of information: allow one more significant figure, but don't use more decimal place
           label.html(thisChart.data[i][j]);
