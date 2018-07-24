@@ -14,14 +14,14 @@ The bars are presented as groups along the x-axis, the number of bars in each gr
 
 # API
 
-A chart is created within a DOM element by calling `drawBarChart(data, options, element)`. A list of options is below; many are self-explanatory or are demonstrated in the example charts.
+A chart is created within a DOM element by calling `drawBarChart(data, options, element)`. A list of options is below; many are self-explanatory or are demonstrated in the example charts. Most of the colour options have 'auto' as a default, in which case the program tries to find a colour itself.
 
-Apart from this function and an object listing the default settings, BAR_CHART_DEFAULTS, everything is contained in a BarChart class. The constructor destroys any previous bar chart elements in the given DOM element, parses the user input, and sets up the different options; the chart may then be drawn.
+Apart from this function and an object listing the default settings, BAR_CHART_DEFAULTS, everything is contained in a BarChart class. The constructor destroys any previous bar chart elements in the given DOM element, creates a unique id for the chart, parses the user input, and sets up the different options; the chart may then be drawn.
 
      data:
        [ [series 1], [series 2], ..., [series n], ([labels]) ]
-       each element of a series should be a number or a two-element array [n, col] with a number and custom colour
-       if any series starts with a string, it is assumed to be an array of labels for the data groups
+       Each element of a series should be a number or a two-element array [n, col] with a number and custom colour.
+       If any series starts with a string, it is assumed to be an array of labels for the data groups.
     
      options: an object with any of the following:
        barGroupGapRatio: 0.7,              // ratio of (width of bar group) to (width of bar + gap separating groups)
@@ -35,7 +35,7 @@ Apart from this function and an object listing the default settings, BAR_CHART_D
        displayYAxis: true,
        displayTicks: false,
        displayTickLabels: false,
-       tickInterval: 'auto',
+       tickInterval: 'auto',              // a numerical value between ticks
        displayHeightLabels: true,
        heightLabelPos: 'end',             // 'end', 'middle', or 'axis'
        displayDataLabels: true,
@@ -43,7 +43,7 @@ Apart from this function and an object listing the default settings, BAR_CHART_D
        heightLabelColourFunction: 'auto', // user can supply their own function depending on bar colour and chart background: (barCol, bgCol) => labelCol
        animateBars: true,
        animateHeightLabels: true,
-       animationLength: 2000,
+       animationLength: 2000,              // time in ms
        randomSpeed: false,                 // when true, bars and height labels grow at same (random) speed...
        randomBarSpeed: false,              // ... whereas this line and the next make independent random speeds
        randomHeightLabelSpeed: false,
@@ -59,7 +59,7 @@ Apart from this function and an object listing the default settings, BAR_CHART_D
        captionPadding: 10,
     
      element:
-       a DOM element
+       A DOM element.
 
 # Issues
 
@@ -91,4 +91,9 @@ There is also little to no **error checking** or data validation: if the user do
 
 I consulted Wikipedia for some colour details (e.g., on luminance), and the jQuery API (https://api.jquery.com/) to learn the basics of jQuery.
 
-#    Example Screenshots (embedded within the readme as image tags)
+# Example Screenshots
+
+![example 1](Screenshot_2018-07-24 Bar Chart demo-1.png)
+![example 2](Screenshot_2018-07-24 Bar Chart demo-2.png)
+![example 3](Screenshot_2018-07-24 Bar Chart demo-3.png)
+![example 4](Screenshot_2018-07-24 Bar Chart demo-4.png)

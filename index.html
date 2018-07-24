@@ -10,13 +10,13 @@
   <script src='barchart.js'></script>
   <script>
     $( document ).ready(function() {
-      drawBarChart([[1, 1, 2, 2, 3, 3], [2, 3, 1, 3, 1, 2], [3, 2, 3, 1, 2, 1], ['armadillo', 'barracuda', 'chinchilla', 'dolphin', 'echidna', 'falcon']], {animateBars: false, title: 'labels for data groups', caption: 'note how each label\'s bounding box coincides with the group of bars', barGroupGapRatio: 0.85, backgroundColour: 'rgb(50,35,130)', displayHeightLabels: false}, '#chart0');
-      drawBarChart([[19, 17, [4, 'rgb(150, 0, 0']], [20, 13.4, [7, 'rgb(210, 210, 0)']], [33, 15, [5, 'rgb(180, 170, 60)']], [15, 16, 17], ['great', 'good', 'pretty bad']], {animateBars: false, defaultBarColour: 'rgb(250, 150, 175)', displayHeightLabels: false, caption: 'multiple data series;<br>just one colour, except where overridden;<br>gaps within groups (i.e., barGapRatio < 1)', displayTicks: true, barGapRatio: 0.8}, '#chart1');
-
-      drawBarChart([[1, 2, 3]], {caption: 'you won\'t see this'}, '#chart2');  // this chart will get erased by the next one
-      drawBarChart([[-8, -13, -5, -2, -19, -3, -1, -4], ['1940', '1950', '1960', '1970', '1980', '1990', '2000', '2010']], {displayHeightLabels: false, displayAxes: false, padding: 25, barGroupGapRatio: 0.000001, caption: '<p>previous chart here was automatically erased (see source)</p><p>and now there are some very slow thin lines: bar-to-gap ratio is <em>almost</em> 0</p>', captionSize: 15, captionPadding: 1, animationLength: 20000, randomSpeed: true}, '#chart2');
-      drawBarChart([[1, 7, 0, 1, 2, 5, -10, 8, [18, 'rgb(200, 250, 10)'], 2], ['', '', '', '', '', '', '', '', '😖', '']], {title: 'quick animation', titleSize: 15, titlePadding: 5, displayTicks: true, displayTickLabels: true, barGroupGapRatio: 0.9, backgroundColourInherit: true, displayHeightLabels: false, caption: 'background colour inherited from page CSS (as opposed to bar chart defaults);<br>one of the bars has a custom colour;<br>background colour of data labels is set to fully transparent', animationLength: 500, dataLabelBackgroundColour: 'rgba(0,0,0,0)'}, '#chart3');
+      drawBarChart([[1, 2, 3]], {caption: 'you won\'t see this'}, '#chart0');  // this chart will get erased by the next one
+      drawBarChart([[-8, -13, -5, -2, -19, -3, -1, -4], ['1940', '1950', '1960', '1970', '1980', '1990', '2000', '2010']], {displayHeightLabels: false, displayAxes: false, padding: 25, barGroupGapRatio: 0.000001, caption: '<p>previous chart here was automatically erased (see source)</p><p>and now there are some very slow thin lines: bar-to-gap ratio is <em>almost</em> 0</p>', captionSize: 15, captionPadding: 1, animationLength: 20000, randomSpeed: true}, '#chart0');
+      drawBarChart([[1, 7, 0, 1, 2, 5, -10, 8, [18, 'rgb(200, 250, 10)'], 2], ['', '', '', '', '', '', '', '', '😖', '']], {title: 'quick animation', titleSize: 15, titlePadding: 5, displayTicks: true, displayTickLabels: true, barGroupGapRatio: 0.9, backgroundColourInherit: true, displayHeightLabels: false, caption: 'background colour inherited from page CSS (as opposed to bar chart defaults);<br>one of the bars has a custom colour;<br>background colour of data labels is set to fully transparent', animationLength: 500, dataLabelBackgroundColour: 'rgba(0,0,0,0)'}, '#chart1');
       
+      drawBarChart([[1, 1, 2, 2, 3, 3], [2, 3, 1, 3, 1, 2], [3, 2, 3, 1, 2, 1], ['armadillo', 'barracuda', 'chinchilla', 'dolphin', 'echidna', 'falcon']], {animateBars: false, title: 'labels for data groups', caption: 'note how each label\'s bounding box coincides with the group of bars', barGroupGapRatio: 0.85, backgroundColour: 'rgb(50,35,130)', displayHeightLabels: false}, '#chart2');
+      drawBarChart([[19, 17, [4, 'rgb(150, 0, 0']], [20, 13.4, [7, 'rgb(210, 210, 0)']], [33, 15, [5, 'rgb(180, 170, 60)']], [15, 16, 17], ['great', 'good', 'pretty bad']], {animateBars: false, defaultBarColour: 'rgb(250, 150, 175)', displayHeightLabels: false, caption: 'multiple data series;<br>just one colour, except where overridden;<br>gaps within groups (i.e., barGapRatio < 1)', displayTicks: true, barGapRatio: 0.8}, '#chart3');
+
       drawBarChart([[13, -8, 5, -3, 2, -1, 1, 0, 1, 1, 2, 3, 5, 8, 13]], {backgroundColour: 'rgb(162, 152, 112)', displayAxes: false, barGroupGapRatio: 0.8, animateHeightLabels: false, title: 'number labels that don\'t change during animation', caption:'note how labels are placed outside bars when there isn\'t enough room inside', captionPadding: 0, titleSize: 15, titlePadding: 0, titleColour: 'rgb(0,50,0)'}, '#chart4');
       drawBarChart([[0, 1, 8, 27, 64, 125], [1, 1, 2, 6, 24, 120]], {title: 'whole numbers', caption: 'even though some inputs have 3 sig. figs, all inputs are integers: thus, animated numbers are restricted to integers as well (so we won\'t see 0.9, say, during animation, even though it has only 1 sig. fig.)', captionSize: 14, captionPadding: 2, displayTicks: true, backgroundColour: 'rgb(175, 35, 65)', displayYAxis: false, displayTickLabels: true}, '#chart5');
       
@@ -50,12 +50,12 @@
     <h1>BAR CHART DEMO</h1>
   </div>
   
-  <div class='container'>
-    <span class='barChart' id='chart0' style='position: relative; width:700px; height:300px;'></span>
-    <span class='barChart' id='chart1' style='position: relative; width:420px; height:300px;'></span>
+  <div class='container'>    
+    <span class='barChart' id='chart0' style='position: relative; width:460px; height:300px;'></span>
+    <span class='barChart' id='chart1' style='position: relative; width:660px; height:300px;'></span>
 
-    <span class='barChart' id='chart2' style='position: relative; width:460px; height:300px;'></span>
-    <span class='barChart' id='chart3' style='position: relative; width:660px; height:300px;'></span>
+    <span class='barChart' id='chart2' style='position: relative; width:700px; height:300px;'></span>
+    <span class='barChart' id='chart3' style='position: relative; width:420px; height:300px;'></span>
 
     <span class='barChart' id='chart4' style='position: relative; width:620px; height:300px;'></span>    
     <span class='barChart' id='chart5' style='position: relative; width:500px; height:300px;'></span>
