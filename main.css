@@ -8,6 +8,10 @@ body {
   color: midnightblue;
 }
 
+a {
+  color: royalblue;
+}
+
 h1 {
   text-align: center;
   background-color: dimgrey;
