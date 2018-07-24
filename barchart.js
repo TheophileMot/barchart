@@ -64,16 +64,39 @@ class BarChart {
     // generate (very likely) unique id to avoid collisions with other charts on page
     this.id = this.generateId();
 
-    this.data = data;
+    [this.data, this.dataColours, this.dataLabels] = this.parseData(data);
     this.options = options;
     this.element = element;
 
-    this.numDataSeries = this.calcNumDataSeries();
     this.setOptions();
   }
 
-  calcNumDataSeries() {
-    return this.data.length - ((typeof this.data[this.data.length - 1][0] == 'string') ? 1 : 0);  // look at first entry of last array: if it's a string, the last array isn't a data series but labels
+  // sift out data, custom colours, labels
+  parseData(data) {
+    let resultData = [];
+    let resultColours = [];
+    let resultLabels = [];
+    for (let i in data) {
+      if (typeof data[i][0] == 'string') { // if first entry of array is string, then the array is a list of data labels
+        resultLabels.push(...data[i]);
+      } else {                             // data series
+        let dataSeries = [];
+        let colourSeries = [];
+        for (let j in data[i]) {
+          if (typeof data[i][j] == 'number') {
+            dataSeries.push(data[i][j]);
+            colourSeries.push(undefined);
+          } else {                         // input is [data, colour] pair
+            dataSeries.push(data[i][j][0]);
+            colourSeries.push(data[i][j][1]);
+          }
+        }
+        resultData.push(dataSeries);
+        resultColours.push(colourSeries);
+      }
+    }
+
+    return [resultData, resultColours, resultLabels];
   }
 
   setOptions() {
@@ -89,14 +112,14 @@ class BarChart {
     this.backgroundColour = $( element ).css('background-color');
     this.defaultBarColour = options.defaultBarColour || BAR_CHART_DEFAULTS.defaultBarColour;
     if (this.defaultBarColour == 'auto') { this.defaultBarColour = this.calcAutoBarColour(); }
-    if (!Array.isArray(this.defaultBarColour)) { this.defaultBarColour = Array(this.numDataSeries).fill(this.defaultBarColour); }
+    if (!Array.isArray(this.defaultBarColour)) { this.defaultBarColour = Array(this.data.length).fill(this.defaultBarColour); }
     this.displayAxes = (typeof options.displayAxes == 'boolean') ? options.displayAxes : BAR_CHART_DEFAULTS.displayAxes;
     this.displayXAxis = this.displayAxes && ((typeof options.displayXAxis == 'boolean') ? options.displayXAxis : BAR_CHART_DEFAULTS.displayXAxis);
     this.displayYAxis = this.displayAxes && ((typeof options.displayYAxis == 'boolean') ? options.displayYAxis : BAR_CHART_DEFAULTS.displayYAxis);
     this.displayTicks = (typeof options.displayTicks == 'boolean') ? options.displayTicks : BAR_CHART_DEFAULTS.displayTicks;
     this.displayHeightLabels = (typeof options.displayHeightLabels == 'boolean') ? options.displayHeightLabels : BAR_CHART_DEFAULTS.displayHeightLabels;
     this.displayDataLabels = (typeof options.displayDataLabels == 'boolean') ? options.displayDataLabels : BAR_CHART_DEFAULTS.displayDataLabels;
-    if (this.numDataSeries == this.data.length) { this.displayDataLabels = false; }  // don't display data labels if there aren't any
+    if (this.dataLabels == undefined) { this.displayDataLabels = false; }  // don't display data labels if there aren't any
     this.labelColourFunction = options.labelColourFunction || BAR_CHART_DEFAULTS.labelColourFunction;
     if (this.labelColourFunction == 'auto') { this.labelColourFunction = this.autoLabelColour; }
     
@@ -199,7 +222,7 @@ class BarChart {
     // properties derived from dimensions
     this.barGroupSpacing = this.calcBarGroupSpacing();
     this.barGroupWidth = Math.ceil(Math.max(1, this.barGroupSpacing * this.barGroupGapRatio));
-    this.barWidth = this.barGroupWidth * this.barGapRatio / this.numDataSeries;
+    this.barWidth = this.barGroupWidth * this.barGapRatio / this.data.length;
     this.barSpacing = this.calcBarSpacing();
     this.maxYBars = this.calcMaxYBars();
     this.minYBars = this.calcMinYBars();
@@ -214,18 +237,17 @@ class BarChart {
   }
 
   drawBars() {
-    for (let i = 0; i < this.numDataSeries; i++) {
-      let dataGroup = this.data[i];
-      for (let j in dataGroup) {
+    for (let i in this.data) {
+      for (let j in this.data[i]) {
         let barId = this.id + '-bar' + i + '-' + j;
         let barOptions = {
           backgroundColor: this.defaultBarColour[i],
           position: 'absolute',
           left: this.barLeftPos(i, j),
           width: this.barWidth,
-          bottom: (dataGroup[j] >= 0) ? this.xAxisFromBottom : undefined,
-          top: (dataGroup[j] < 0) ? this.xAxisFromTop : undefined,
-          height: this.animateBars ? 0 : this.heightInPixels(dataGroup[j]),
+          bottom: (this.data[i][j] >= 0) ? this.xAxisFromBottom : undefined,
+          top: (this.data[i][j] < 0) ? this.xAxisFromTop : undefined,
+          height: this.animateBars ? 0 : this.heightInPixels(this.data[i][j]),
         };
         this.createRectangle(barId, barOptions);
       }
@@ -287,8 +309,7 @@ class BarChart {
 
   drawDataLabels() {
     if (this.displayDataLabels) {
-      let labels = this.data[this.data.length - 1];
-      for (let j in labels) {
+      for (let j in this.dataLabels) {
         let labelColour = this.contrastingShade(this.backgroundColour, 0.5);
         let labelBackgroundColour = this.transparentColour(this.backgroundColour, 0.6);  // use semi-transparent background colour for label so that it shows up against bars
 
@@ -308,7 +329,7 @@ class BarChart {
           textAlign: 'center',
           padding: labelPadding,
         };
-        let rect = this.createRectangle(labelId, labelOptions, labels[j]);
+        let rect = this.createRectangle(labelId, labelOptions, this.dataLabels[j]);
         rect.width(Math.max(rect.outerWidth(), this.barGroupWidth)); // if label is short, expand its width to take up whole group
         rect.css('left', this.barLeftPos(0, j) - labelPadding + (this.barGroupWidth - parseFloat(rect.css('width'))) * 0.5);  // wait until here to assign left, since it depends on width (which depends on text)
       }
@@ -317,9 +338,8 @@ class BarChart {
   
   drawHeightLabels() {
     if (this.displayHeightLabels) {
-      for (let i = 0; i < this.numDataSeries; i++) {
-        let dataGroup = this.data[i];
-        for (let j in dataGroup) {
+      for (let i = 0; i < this.data.length; i++) {
+        for (let j in this.data[i]) {
           let barColour = $( '#' + this.id + '-bar' + i + '-' + j ).css('backgroundColor');
           let labelColour = this.labelColourFunction(barColour, this.backgroundColour);
 
@@ -349,7 +369,7 @@ class BarChart {
 
   animate() {
     if (this.animateBars) {
-      for (let i = 0; i < this.numDataSeries; i++) {
+      for (let i = 0; i < this.data.length; i++) {
         for (let j in this.data[i]) {
           this.animateBar(i, j);
         }
@@ -565,17 +585,17 @@ class BarChart {
   // calculate horizontal spacing ("units") between bars within groups:
   //   - each unit is (bar + gap), so there are (#data series - 1) units followed by the last bar
   calcBarSpacing() {
-    return this.barGroupWidth / (this.numDataSeries - 1 + this.barGapRatio);
+    return this.barGroupWidth / (this.data.length - 1 + this.barGapRatio);
   }
 
   // calculate maximum y value (top or bottom) of all bars: this could be 0 if all data is negative
   calcMaxYBars() {
-    return Math.max(0, ...this.data.slice(0, this.numDataSeries).map( a => Math.max(0, ...a) ));
+    return Math.max(0, ...this.data.slice(0, this.data.length).map( a => Math.max(0, ...a) ));
   }
 
   // calculate minimum y value (top or bottom) of all bars: this could be 0 if all data is positive
   calcMinYBars() {
-    return Math.min(0, ...this.data.slice(0, this.numDataSeries).map( a => Math.min(0, ...a) ));
+    return Math.min(0, ...this.data.slice(0, this.data.length).map( a => Math.min(0, ...a) ));
   }
   
   calcMaxYBarsTicks() {
