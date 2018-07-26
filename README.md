@@ -93,7 +93,7 @@ I consulted Wikipedia for some colour details (e.g., on luminance), and the jQue
 
 # Example Screenshots
 
-![example 1](Screenshot_2018-07-24 Bar Chart demo-1.png)
-![example 2](Screenshot_2018-07-24 Bar Chart demo-2.png)
-![example 3](Screenshot_2018-07-24 Bar Chart demo-3.png)
-![example 4](Screenshot_2018-07-24 Bar Chart demo-4.png)
+![example 1](https://github.com/TimothyMott/barchart/blob/master/images/Screenshot_2018-07-24%20Bar%20Chart%20demo-1.png)
+![example 2](https://github.com/TimothyMott/barchart/blob/master/images/Screenshot_2018-07-24%20Bar%20Chart%20demo-2.png)
+![example 3](https://github.com/TimothyMott/barchart/blob/master/images/Screenshot_2018-07-24%20Bar%20Chart%20demo-3.png)
+![example 4](https://github.com/TimothyMott/barchart/blob/master/images/Screenshot_2018-07-24%20Bar%20Chart%20demo-4.png)
